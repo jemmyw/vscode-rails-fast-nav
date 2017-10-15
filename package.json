@@ -11,14 +11,14 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.navigateRails"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "extension.navigateRails",
+                "title": "Rails Navigation"
             }
         ]
     },
@@ -30,9 +30,13 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.5.3",
-        "vscode": "^1.1.5",
+        "@types/fs-extra": "^4.0.2",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "typescript": "^2.5.3",
+        "vscode": "^1.1.5"
+    },
+    "dependencies": {
+        "fs-extra": "^4.0.2"
     }
 }
