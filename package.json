@@ -31,12 +31,15 @@
     },
     "devDependencies": {
         "@types/fs-extra": "^4.0.2",
+        "@types/inflected": "^1.1.29",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
         "typescript": "^2.5.3",
         "vscode": "^1.1.5"
     },
     "dependencies": {
-        "fs-extra": "^4.0.2"
+        "fs-extra": "^4.0.2",
+        "inflected": "^2.0.2",
+        "vscode-uri": "^1.0.1"
     }
 }

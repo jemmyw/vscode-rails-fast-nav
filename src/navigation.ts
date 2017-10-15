@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import Uri from 'vscode-uri';
 import { CurrentRailsFile } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -70,11 +71,13 @@ function getCurrentRailsFile(): CurrentRailsFile {
   const editor = vscode.window.activeTextEditor;
   const activeSelection = editor.selection.active;
   const railsRoot = getRailsRoot(editor.document.fileName);
-  const filename = getRelativeFile(railsRoot, editor.document.fileName);
+  const filename = editor.document.fileName;
 
   return {
     railsRoot,
     filename,
+    basename: path.basename(filename),
+    dirname: path.dirname(filename),
     inApp: appFile.test(filename),
     fileType: getFileType(filename),
     methodName: getLastMethodName(editor.document, activeSelection.line),
@@ -82,28 +85,41 @@ function getCurrentRailsFile(): CurrentRailsFile {
   };
 }
 
-export async function navigateRails() {
+interface IndexedQuickPickItem extends vscode.QuickPickItem {
+  index: number;
+}
+
+export async function navigateRails(...args) {
+  console.log(args);
   try {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
-      console.log('no editor');
       return;
     }
 
     const railsFile = getCurrentRailsFile();
     const switchableFiles = await getCheckedSwitches(railsFile);
-    const quickPickItems:vscode.QuickPickItem[] = switchableFiles.map(function(file):vscode.QuickPickItem {
-      return {
+    const quickPickItems: IndexedQuickPickItem[] = switchableFiles.map(
+      (file, index): IndexedQuickPickItem => ({
         label: file.title,
-        description: file.filename,
-        detail: file.type
-      }
-    });
+        description: '',
+        detail: path.relative(railsFile.railsRoot, file.filename),
+        index,
+      })
+    );
 
-    const picked = await vscode.window.showQuickPick(quickPickItems);
-    console.log('picked', picked);
+    const picked: IndexedQuickPickItem = await vscode.window.showQuickPick(
+      quickPickItems
+    );
+
+    if (picked) {
+      const switchFile = switchableFiles[picked.index];
+      const uri = Uri.parse('file://' + switchFile.filename);
+      return await vscode.workspace
+        .openTextDocument(switchFile.filename)
+        .then(vscode.window.showTextDocument);
+    }
   } catch (err) {
     console.error(err);
   }
-  console.log('end');
 }

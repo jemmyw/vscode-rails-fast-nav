@@ -17,10 +17,23 @@ export class RailsWorkspace {
   }
 
   get specPath(): string {
-    return path.join(this.path, 'specs');
+    return path.join(this.path, 'spec');
   }
+
   get testPath(): string {
     return path.join(this.path, 'tests');
+  }
+
+  get controllersPath(): string {
+    return path.join(this.appPath, 'controllers');
+  }
+
+  get modelsPath(): string {
+    return path.join(this.appPath, 'models');
+  }
+
+  get viewsPath(): string {
+    return path.join(this.appPath, 'views');
   }
 
   async hasSpecs(): Promise<boolean> {
