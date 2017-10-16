@@ -5,24 +5,11 @@ import * as fs from 'fs-extra';
 import * as vscode from 'vscode';
 import { singularize, pluralize } from 'inflected';
 
-const viewExtensions = [
-  'json',
-  'json.jbuilder',
-  'erb',
-  'html.erb',
-  'js',
-  'js.erb',
-];
-
 interface SwitchFile {
   type: string;
   title: string;
   filename: string;
   checkedExists?: boolean;
-}
-
-interface SwitchFileExists extends SwitchFile {
-  exists: boolean;
 }
 
 type SlightPromise<T> = T | Promise<T>;
@@ -100,8 +87,11 @@ function testPath(
 }
 
 function isInAppDir(dir: string) {
-  return (railsFile: CurrentRailsFile) =>
-    railsFile.inApp && railsFile.filename.includes('/' + dir + '/');
+  return (railsFile: CurrentRailsFile) => {
+    return (
+      railsFile.inApp && railsFile.filename.includes(path.sep + dir + path.sep)
+    );
+  };
 }
 
 const isController = isInAppDir('controllers');
@@ -130,8 +120,15 @@ async function modelMaker(
   const singularName = singularize(justName);
   let location = locationWithinAppLocation(railsFile, workspace);
 
-  while (location.length > 0) {
-    const modelPath = path.join(workspace.modelsPath, location, singularName);
+  console.log('model maker');
+  console.log(location.length);
+
+  while (true) {
+    const modelPath = path.join(
+      workspace.modelsPath,
+      location,
+      singularName + '.rb'
+    );
 
     if (await fs.pathExists(modelPath)) {
       return [
@@ -145,24 +142,12 @@ async function modelMaker(
     }
 
     location = path.dirname(location);
-  }
-
-  return [];
-}
-
-function flatMap<T, R>(fn: (item: T, index: number) => R | R[], ary: T[]): R[] {
-  const acc: R[] = [];
-
-  for (let i = 0; i < ary.length; i++) {
-    const items: R | R[] = fn(ary[i], i);
-    if (Array.isArray(items)) {
-      acc.push(...items);
-    } else {
-      acc.push(items);
+    if (location === '.' || location.length === 0) {
+      break;
     }
   }
 
-  return acc;
+  return [];
 }
 
 async function viewMaker(
@@ -182,8 +167,15 @@ async function viewMaker(
     )
   );
 
+  const methods = railsFile.methods.sort((a, b) => {
+    if (a === railsFile.methodName) {
+      return -1;
+    }
+    return 0;
+  });
+
   return await Promise.all(
-    railsFile.methods.map(methodName =>
+    methods.map(methodName =>
       vscode.workspace
         .findFiles(path.join(viewPath, methodName + '*'), null, 10)
         .then(files =>
@@ -246,8 +238,8 @@ async function controllerMaker(
 const rules = [
   switchRule((f, w) => w.hasSpecs(), specPath),
   // switchRule((f, w) => w.hasTests(), testPath),
-  // switchRule(isController, modelMaker),
-  // switchRule(isController, viewMaker),
+  switchRule(isController, modelMaker),
+  switchRule(isController, viewMaker),
   // switchRule(isModel, controllerMaker),
   // switchRule(isView, controllerMaker),
 ];

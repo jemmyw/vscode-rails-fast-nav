@@ -14,7 +14,7 @@ function getLastMethodName(
 ): string | null {
   for (let i = line; i >= 0; i--) {
     const line = document.lineAt(i);
-    const matches = line.text.match(defReg);
+    const matches = defReg.exec(line.text);
 
     if (matches) {
       return matches[1];
@@ -78,7 +78,7 @@ function getCurrentRailsFile(): CurrentRailsFile {
     filename,
     basename: path.basename(filename),
     dirname: path.dirname(filename),
-    inApp: appFile.test(filename),
+    inApp: path.relative(railsRoot, filename).startsWith('app' + path.sep),
     fileType: getFileType(filename),
     methodName: getLastMethodName(editor.document, activeSelection.line),
     methods: getAllMethodNames(editor.document),
@@ -89,8 +89,7 @@ interface IndexedQuickPickItem extends vscode.QuickPickItem {
   index: number;
 }
 
-export async function navigateRails(...args) {
-  console.log(args);
+export async function navigateRails() {
   try {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
