@@ -1,7 +1,7 @@
 {
-    "name": "rails-nav",
-    "displayName": "rails-nav",
-    "description": "Rails navigation",
+    "name": "rails-fast-nav",
+    "displayName": "rails-fast-nav",
+    "description": "Rails Fast Navigation",
     "version": "0.0.1",
     "publisher": "jemmyw",
     "engines": {
@@ -11,14 +11,15 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.navigateRails"
+        "workspaceContains:bin/rails",
+        "workspaceContains:script/rails"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.navigateRails",
-                "title": "Rails Navigation"
+                "command": "extension.fastNavigateRails",
+                "title": "Rails Fast Navigation"
             }
         ]
     },

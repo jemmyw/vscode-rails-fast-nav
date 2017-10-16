@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import {RailsFile} from './types';
 
 export class RailsWorkspace {
   private _hasSpecs: boolean;
@@ -81,3 +82,22 @@ export const RailsWorkspaceCache = {
     return cache[path];
   },
 };
+
+export function locationWithinAppLocation(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  return path
+    .dirname(relativeToAppDir(railsFile, workspace))
+    .split(path.sep)
+    .slice(1)
+    .join(path.sep);
+}
+
+export function relativeToAppDir(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  return path.relative(workspace.appPath, railsFile.filename);
+}
+

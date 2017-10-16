@@ -1,0 +1,18 @@
+import { RailsFile, SwitchFile } from '../types';
+import { RailsWorkspace, relativeToAppDir } from '../rails-workspace';
+import { appendWithoutExt } from '../path-utils';
+import * as path from 'path';
+
+export function testMaker(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): SwitchFile {
+  return {
+    filename: path.join(
+      workspace.testPath,
+      appendWithoutExt(relativeToAppDir(railsFile, workspace), '_test')
+    ),
+    title: 'Test file',
+    type: 'test',
+  };
+}
