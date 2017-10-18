@@ -18,8 +18,19 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.fastNavigateRails",
-                "title": "Rails Fast Navigation"
+                "command": "extension.railsFastNavigate",
+                "title": "Rails: Fast Navigation"
+            },
+            {
+                "command": "extension.railsFastSwitchToView",
+                "title": "Rails: Switch to View"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.railsFastNavigate",
+                "key": "alt+r",
+                "when": "editorTextFocus"
             }
         ]
     },
@@ -35,6 +46,7 @@
         "@types/inflected": "^1.1.29",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
+        "ineeda": "^0.11.0",
         "typescript": "^2.5.3",
         "vscode": "^1.1.5"
     },

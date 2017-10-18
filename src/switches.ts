@@ -1,8 +1,17 @@
-import { SwitchFile, CheckedSwitchFile, SwitchRule } from './types';
+import { SwitchFile, CheckedSwitchFile, SwitchRule, OrPromise } from './types';
 import { RailsWorkspaceCache } from './rails-workspace';
 import { RailsFile } from './rails-file';
 import * as fs from 'fs-extra';
 import { rules } from './rules';
+
+export async function getSwitchesFromRule(
+  rule: SwitchRule,
+  railsFile: RailsFile
+): Promise<CheckedSwitchFile[]> {
+  const workspace = await RailsWorkspaceCache.fetch(railsFile.railsRoot);
+  const switchFiles = rule(railsFile, workspace);
+  return checkSwitchFiles(switchFiles);
+}
 
 export async function getSwitchesFromRules(
   rules: SwitchRule[],
@@ -14,30 +23,35 @@ export async function getSwitchesFromRules(
   ).then(switches => [].concat(...switches));
 }
 
+async function switchFileExists(switchFile: SwitchFile): Promise<boolean> {
+  return switchFile.checkedExists || fs.pathExists(switchFile.filename);
+}
+
+async function checkSwitchFile(
+  switchFile: OrPromise<SwitchFile>
+): Promise<SwitchFile> {
+  const resolvedSwitchFile = await Promise.resolve(switchFile);
+
+  return {
+    ...resolvedSwitchFile,
+    checkedExists: await switchFileExists(resolvedSwitchFile),
+  };
+}
+
+function existsFilter(switchFile: SwitchFile): boolean {
+  return Boolean(switchFile.checkedExists);
+}
+
 export async function checkSwitchFiles(
-  switchFiles: SwitchFile[]
+  switchFiles: SwitchFile[] | Promise<SwitchFile[]>
 ): Promise<CheckedSwitchFile[]> {
-  const withExisting = await Promise.all(
-    switchFiles.map(async (switchFile: SwitchFile):Promise<SwitchFile> => {
-      if (switchFile.checkedExists) {
-        return switchFile as CheckedSwitchFile;
-      }
-
-      const exists = await fs.pathExists(switchFile.filename);
-
-      return {
-        ...switchFile,
-        checkedExists: exists,
-      };
-    })
-  );
-
-  return withExisting.filter(sf => sf.checkedExists) as CheckedSwitchFile[];
+  return (await Promise.all(
+    (await Promise.resolve(switchFiles)).map(checkSwitchFile)
+  )).filter(existsFilter) as CheckedSwitchFile[];
 }
 
 export async function getCheckedSwitches(
   railsFile: RailsFile
 ): Promise<CheckedSwitchFile[]> {
-  const switchFiles = await getSwitchesFromRules(rules, railsFile);
-  return await checkSwitchFiles(switchFiles);
+  return await checkSwitchFiles(getSwitchesFromRules(rules, railsFile));
 }

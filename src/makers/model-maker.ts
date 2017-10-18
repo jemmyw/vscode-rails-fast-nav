@@ -1,4 +1,5 @@
-import { RailsFile, SwitchFile } from '../types';
+import { SwitchFile } from '../types';
+import { RailsFile } from '../rails-file';
 import { RailsWorkspace, locationWithinAppLocation } from '../rails-workspace';
 import { singularize } from 'inflected';
 import * as fs from 'fs-extra';

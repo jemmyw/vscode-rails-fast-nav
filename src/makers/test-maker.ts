@@ -1,4 +1,5 @@
-import { RailsFile, SwitchFile } from '../types';
+import { SwitchFile } from '../types';
+import { RailsFile } from '../rails-file';
 import { RailsWorkspace, relativeToAppDir } from '../rails-workspace';
 import { appendWithoutExt } from '../path-utils';
 import * as path from 'path';

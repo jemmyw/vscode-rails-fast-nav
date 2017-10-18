@@ -1,5 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as vscode from 'vscode';
+import { getAllMethodNames, getLastMethodName } from './ruby-methods';
 
 function isRailsRoot(filename: string): boolean {
   const railsBin = path.join(filename, 'bin', 'rails');
@@ -82,4 +84,16 @@ export class RailsFile {
   isController() { return this.isInAppDir('controllers'); }
   isModel() { return this.isInAppDir('models'); }
   isView() { return this.isInAppDir('views'); }
+}
+
+export function getCurrentRailsFile(): RailsFile {
+  const editor = vscode.window.activeTextEditor;
+  const activeSelection = editor.selection.active;
+  const filename = editor.document.fileName;
+
+  return new RailsFile(
+    filename,
+    getLastMethodName(editor.document, activeSelection.line),
+    getAllMethodNames(editor.document)
+  );
 }

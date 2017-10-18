@@ -1,10 +1,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import {RailsFile} from './types';
+import { RailsFile } from './rails-file';
 
 export class RailsWorkspace {
-  private _hasSpecs: boolean;
-  private _hasTests: boolean;
   private _knownFiles: { [index: string]: boolean } = {};
 
   constructor(private _path: string) {}
@@ -100,4 +98,3 @@ export function relativeToAppDir(
 ): string {
   return path.relative(workspace.appPath, railsFile.filename);
 }
-

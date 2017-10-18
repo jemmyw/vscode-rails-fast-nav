@@ -1,7 +1,20 @@
-import { RailsFile, SwitchFile } from '../types';
+import { SwitchFile } from '../types';
+import { RailsFile } from '../rails-file';
 import { RailsWorkspace, locationWithinAppLocation } from '../rails-workspace';
 import * as path from 'path';
-import * as vscode from 'vscode';
+import * as fs from 'fs-extra';
+
+function isPartial(filename: string): boolean {
+  return path.basename(filename).startsWith('_');
+}
+
+function viewFileTitle(filename: string): string {
+  return viewFileType(filename) + ' ' + path.basename(filename);
+}
+
+function viewFileType(filename: string): string {
+  return isPartial(filename) ? 'Partial' : 'View';
+}
 
 export async function viewMaker(
   railsFile: RailsFile,
@@ -11,36 +24,51 @@ export async function viewMaker(
     .split('_')
     .slice(0, -1)
     .join('_');
-  const viewPath = path.relative(
-    workspace.path,
-    path.join(
-      workspace.viewsPath,
-      locationWithinAppLocation(railsFile, workspace),
-      justName
-    )
+  const viewPath = path.join(
+    workspace.viewsPath,
+    locationWithinAppLocation(railsFile, workspace),
+    justName
   );
 
-  const methods = railsFile.methods.sort((a, b) => {
-    if (a === railsFile.methodName) {
-      return -1;
-    }
-    return 0;
-  });
+  const files = await fs.readdir(viewPath);
 
-  return await Promise.all(
-    methods.map(methodName =>
-      vscode.workspace
-        .findFiles(path.join(viewPath, methodName + '*'), null, 10)
-        .then(files =>
-          files.map((file: vscode.Uri): SwitchFile => ({
-            checkedExists: true,
-            filename: file.fsPath,
-            title: 'View ' + path.basename(file.fsPath),
-            type: 'view',
-          }))
-        )
-    )
-  ).then((allViews: SwitchFile[][]): SwitchFile[] => {
-    return [].concat(...allViews);
-  });
+  return files
+    .sort(function(a, b) {
+      if (a.startsWith('_') && !b.startsWith('_')) {
+        return 1;
+      }
+      if (b.startsWith('_') && !a.startsWith('_')) {
+        return 1;
+      }
+      const [aName, bName] = [a.split('.')[0], b.split('.')[0]];
+      const [aMethod, bMethod] = [
+        railsFile.methods.indexOf(aName) > -1,
+        railsFile.methods.indexOf(bName) > -1,
+      ];
+      if (aMethod && !bMethod) {
+        return -1;
+      }
+      if (bMethod && !aMethod) {
+        return 1;
+      }
+      if (aName === railsFile.methodName) {
+        return -1;
+      }
+      if (bName === railsFile.methodName) {
+        return 1;
+      }
+      if (aName < bName) {
+        return -1;
+      }
+      if (bName < aName) {
+        return 1;
+      }
+      return 0;
+    })
+    .map(file => ({
+      checkedExists: true,
+      filename: path.join(viewPath, file),
+      title: viewFileTitle(file),
+      type: viewFileType(file),
+    }));
 }

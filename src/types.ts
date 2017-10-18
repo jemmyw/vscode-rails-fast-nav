@@ -12,16 +12,16 @@ export interface CheckedSwitchFile extends SwitchFile {
   checkedExists: true
 }
 
-export type SlightPromise<T> = T | Promise<T>;
+export type OrPromise<T> = T | Promise<T>;
 
 export type SwitchMatcher = (
   railsFile: RailsFile,
   workspace: RailsWorkspace
-) => SlightPromise<boolean>;
+) => OrPromise<boolean>;
 export type SwitchMaker = (
   railsFile: RailsFile,
   workspace: RailsWorkspace
-) => SlightPromise<SwitchFile | SwitchFile[]>;
+) => OrPromise<SwitchFile | SwitchFile[]>;
 export type SwitchRule = (
   railsFile: RailsFile,
   workspace: RailsWorkspace
