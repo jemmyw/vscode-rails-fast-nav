@@ -17,7 +17,7 @@ export async function switchToView() {
   }
 
   const railsFile = getCurrentRailsFile();
-  if (!railsFile.isController) {
+  if (!railsFile.isController()) {
     return;
   }
 

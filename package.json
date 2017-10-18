@@ -24,6 +24,10 @@
             {
                 "command": "extension.railsFastSwitchToView",
                 "title": "Rails: Switch to View"
+            },
+            {
+                "command": "extension.railsFastSwitchToModel",
+                "title": "Rails: Switch to Model"
             }
         ],
         "keybindings": [

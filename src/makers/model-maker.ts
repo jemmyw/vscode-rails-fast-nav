@@ -5,6 +5,10 @@ import { singularize } from 'inflected';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
+function insideDir(root: string, filename: string): boolean {
+  return !path.relative(root, filename).startsWith('..');
+}
+
 export async function modelMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
@@ -14,14 +18,13 @@ export async function modelMaker(
     .slice(0, -1)
     .join('_');
   const singularName = singularize(justName);
-  let location = locationWithinAppLocation(railsFile, workspace);
+  let location = path.join(
+    workspace.modelsPath,
+    locationWithinAppLocation(railsFile, workspace)
+  );
 
-  while (true) {
-    const modelPath = path.join(
-      workspace.modelsPath,
-      location,
-      singularName + '.rb'
-    );
+  while (insideDir(workspace.modelsPath, location)) {
+    const modelPath = path.join(location, singularName + '.rb');
 
     if (await fs.pathExists(modelPath)) {
       return [
@@ -35,9 +38,6 @@ export async function modelMaker(
     }
 
     location = path.dirname(location);
-    if (location === '.' || location.length === 0) {
-      break;
-    }
   }
 
   return [];
