@@ -2,7 +2,7 @@
     "name": "rails-fast-nav",
     "displayName": "rails-fast-nav",
     "description": "Rails Fast Navigation",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "jemmyw",
     "engines": {
         "vscode": "^1.17.0"
@@ -18,7 +18,7 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.railsFastNavigate",
+                "command": "extension.railsFastNavigation",
                 "title": "Rails: Fast Navigation"
             },
             {
@@ -28,11 +28,19 @@
             {
                 "command": "extension.railsFastSwitchToModel",
                 "title": "Rails: Switch to Model"
+            },
+            {
+                "command": "extension.railsFastSwitchToTest",
+                "title": "Rails: Switch to Test"
+            },
+            {
+                "command": "extension.railsFastSwitchToSpec",
+                "title": "Rails: Switch to Spec"
             }
         ],
         "keybindings": [
             {
-                "command": "extension.railsFastNavigate",
+                "command": "extension.railsFastNavigation",
                 "key": "alt+r",
                 "when": "editorTextFocus"
             }
@@ -56,7 +64,6 @@
     },
     "dependencies": {
         "fs-extra": "^4.0.2",
-        "inflected": "^2.0.2",
-        "vscode-uri": "^1.0.1"
+        "inflected": "^2.0.2"
     }
 }

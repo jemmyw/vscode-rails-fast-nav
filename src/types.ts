@@ -21,8 +21,8 @@ export type SwitchMatcher = (
 export type SwitchMaker = (
   railsFile: RailsFile,
   workspace: RailsWorkspace
-) => OrPromise<SwitchFile | SwitchFile[]>;
+) => OrPromise<SwitchFile[]>;
 export type SwitchRule = (
   railsFile: RailsFile,
   workspace: RailsWorkspace
-) => Promise<SwitchFile[]>;
+) => OrPromise<SwitchFile[]>;

@@ -7,13 +7,13 @@ import * as path from 'path';
 export function testMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
-): SwitchFile {
-  return {
+): SwitchFile[] {
+  return [{
     filename: path.join(
       workspace.testPath,
       appendWithoutExt(relativeToAppDir(railsFile, workspace), '_test')
     ),
     title: 'Test file',
     type: 'test',
-  };
+  }];
 }

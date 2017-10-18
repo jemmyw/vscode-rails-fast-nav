@@ -7,13 +7,13 @@ import * as path from 'path';
 export function specMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
-): SwitchFile {
-  return {
+): SwitchFile[] {
+  return [{
     filename: path.join(
       workspace.specPath,
       appendWithoutExt(relativeToAppDir(railsFile, workspace), '_spec')
     ),
     title: 'Spec file',
     type: 'spec',
-  };
+  }];
 }
