@@ -4,6 +4,7 @@
     "description": "Rails Fast Navigation",
     "version": "1.0.0",
     "publisher": "jemmyw",
+    "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.17.0"
     },
