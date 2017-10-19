@@ -1,8 +1,8 @@
 {
     "name": "rails-fast-nav",
-    "displayName": "rails-fast-nav",
-    "description": "Rails Fast Navigation",
-    "version": "1.0.0",
+    "displayName": "Rails Fast Nav",
+    "description": "Ruby on Rails Navigation",
+    "version": "1.1.0",
     "publisher": "jemmyw",
     "icon": "images/icon.png",
     "engines": {
