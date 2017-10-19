@@ -4,21 +4,79 @@
 //
 
 // The module 'assert' provides assertion methods from node
-import * as assert from 'assert';
+import * as expect from 'unexpected';
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
-// import * as vscode from 'vscode';
+import * as vscode from 'vscode';
 // import * as myExtension from '../extension';
+import * as path from 'path';
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+const projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
-    // Defines a Mocha unit test
-    test("Something 1", () => {
+async function openFile(filename: string) {
+  await vscode.window.showTextDocument(
+    await vscode.workspace.openTextDocument(path.join(projectPath, filename))
+  );
+}
 
+suite('Extension Tests', function() {
+  setup(async () => {
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  });
 
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
-    });
+  test('commands are available', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+
+    const commands = (await vscode.commands.getCommands()).filter(c =>
+      c.startsWith('rails.')
+    );
+
+    [
+      'fastNavigation',
+      'switchToView',
+      'switchToModel',
+      'switchToSpec',
+      'switchToTest',
+    ].forEach(command =>
+      expect(commands, 'to have an item satisfying to be', `rails.${command}`)
+    );
+  });
+
+  test('switch to model', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+    await vscode.commands.executeCommand('rails.switchToModel');
+    expect(
+      vscode.window.activeTextEditor.document.fileName,
+      'to end with',
+      'app/models/cat.rb'
+    );
+  });
+
+  // Mock quickPick
+  test.skip('switch to view, all actions', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+    await vscode.commands.executeCommand('rails.switchToView');
+  });
+
+  test.skip('switch to view', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+    await vscode.commands.executeCommand('workbench.action.gotoLine', 7);
+    await vscode.commands.executeCommand('rails.switchToView');
+    expect(
+      vscode.window.activeTextEditor.document.fileName,
+      'to end with',
+      'app/views/cats/show.js.erb'
+    );
+  });
+
+  test('switch to spec', async () => {
+    await openFile('app/models/cat.rb');
+    await vscode.commands.executeCommand('rails.switchToSpec');
+    expect(
+      vscode.window.activeTextEditor.document.fileName,
+      'to end with',
+      'spec/models/cat_spec.rb'
+    );
+  });
 });

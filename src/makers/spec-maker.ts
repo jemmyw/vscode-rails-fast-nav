@@ -8,12 +8,14 @@ export function specMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): SwitchFile[] {
-  return [{
-    filename: path.join(
-      workspace.specPath,
-      appendWithoutExt(relativeToAppDir(railsFile, workspace), '_spec')
-    ),
-    title: 'Spec file',
-    type: 'spec',
-  }];
+  return [
+    {
+      filename: path.join(
+        workspace.specPath,
+        appendWithoutExt(relativeToAppDir(railsFile, workspace), '_spec')
+      ),
+      title: 'Spec file',
+      type: 'spec',
+    },
+  ];
 }

@@ -7,7 +7,7 @@ export function activate(context: vscode.ExtensionContext) {
   Object.keys(commands).forEach(name => {
     const command = commands[name];
     const disposable = vscode.commands.registerCommand(
-      `extension.railsFast${name}`,
+      `rails.${name}`,
       command
     );
     context.subscriptions.push(disposable);

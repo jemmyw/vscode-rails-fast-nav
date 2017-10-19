@@ -15,7 +15,7 @@ function justName(railsFile: RailsFile) {
   } else {
     return railsFile.basename
       .split('_')
-      .slice(0, -1)
+      .slice(0, railsFile.isTest() ? -2 : -1)
       .join('_');
   }
 }

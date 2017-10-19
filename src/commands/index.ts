@@ -4,9 +4,9 @@ import { switchToModel } from './switch-to-model';
 import { switchToTest } from './switch-to-test';
 
 export const commands = {
-  Navigation: navigateRails,
-  SwitchToView: switchToView,
-  SwitchToModel: switchToModel,
-  SwitchToTest: switchToTest,
-  SwitchToSpec: switchToTest,
+  fastNavigation: navigateRails,
+  switchToView: switchToView,
+  switchToModel: switchToModel,
+  switchToTest: switchToTest,
+  switchToSpec: switchToTest,
 };

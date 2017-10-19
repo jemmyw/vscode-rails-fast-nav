@@ -11,7 +11,7 @@ export async function switchToTest() {
   }
 
   const railsFile = getCurrentRailsFile();
-  if (!railsFile.isController()) {
+  if (railsFile.isTest()) {
     return;
   }
 

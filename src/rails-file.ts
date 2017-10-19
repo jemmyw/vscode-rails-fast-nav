@@ -57,6 +57,14 @@ export class RailsFile {
 
   get fileType(): string {
     if (!this._inApp) {
+      if (this._parsed.name.endsWith('_spec')) {
+        return 'spec';
+      }
+
+      if (this._parsed.name.endsWith('_test')) {
+        return 'test';
+      }
+
       if (this._parsed.ext === '.rb') {
         return 'unknown_ruby';
       }
@@ -84,6 +92,9 @@ export class RailsFile {
   isController() { return this.isInAppDir('controllers'); }
   isModel() { return this.isInAppDir('models'); }
   isView() { return this.isInAppDir('views'); }
+  isTest() {
+    return this.fileType === 'spec' || this.fileType === 'test';
+  }
 }
 
 export function getCurrentRailsFile(): RailsFile {

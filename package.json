@@ -18,29 +18,29 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.railsFastNavigation",
+                "command": "rails.fastNavigation",
                 "title": "Rails: Fast Navigation"
             },
             {
-                "command": "extension.railsFastSwitchToView",
+                "command": "rails.switchToView",
                 "title": "Rails: Switch to View"
             },
             {
-                "command": "extension.railsFastSwitchToModel",
+                "command": "rails.switchToModel",
                 "title": "Rails: Switch to Model"
             },
             {
-                "command": "extension.railsFastSwitchToTest",
+                "command": "rails.switchToTest",
                 "title": "Rails: Switch to Test"
             },
             {
-                "command": "extension.railsFastSwitchToSpec",
+                "command": "rails.switchToSpec",
                 "title": "Rails: Switch to Spec"
             }
         ],
         "keybindings": [
             {
-                "command": "extension.railsFastNavigation",
+                "command": "rails.fastNavigation",
                 "key": "alt+r",
                 "when": "editorTextFocus"
             }
@@ -60,6 +60,7 @@
         "@types/node": "^7.0.43",
         "ineeda": "^0.11.0",
         "typescript": "^2.5.3",
+        "unexpected": "^10.36.0",
         "vscode": "^1.1.5"
     },
     "dependencies": {
