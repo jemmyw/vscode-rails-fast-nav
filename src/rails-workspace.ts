@@ -2,6 +2,12 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { RailsFile } from './rails-file';
 
+/**
+ * Some information about a Rails application at a given path.
+ * 
+ * @export
+ * @class RailsWorkspace
+ */
 export class RailsWorkspace {
   private _knownFiles: { [index: string]: boolean } = {};
 
@@ -70,6 +76,13 @@ interface _RailsWorkspaceCache {
 
 const cache: _RailsWorkspaceCache = {};
 
+/**
+ * A cache of rails workspaces.
+ * 
+ * @example
+ * 
+ *   const workspace = await RailsWorkspaceCache.fetch('/path/to/workspace');
+ */
 export const RailsWorkspaceCache = {
   async fetch(path: string): Promise<RailsWorkspace> {
     if (cache[path]) {
@@ -81,6 +94,14 @@ export const RailsWorkspaceCache = {
   },
 };
 
+/**
+ * Given a rails file, return it's location in the app/* directory of the
+ * workspace.
+ * 
+ * This is useful for deriving the location of related files. For example,
+ * 'app/models/subdir/model.rb', will translate to 'subdir/model.rb', and if
+ * we're looking for a spec that becomes 'spec/subdir/model_spec.rb'`
+ */
 export function locationWithinAppLocation(
   railsFile: RailsFile,
   workspace: RailsWorkspace
@@ -92,6 +113,9 @@ export function locationWithinAppLocation(
     .join(path.sep);
 }
 
+/**
+ * Get the relative path to the file from the workspace root
+ */
 export function relativeToAppDir(
   railsFile: RailsFile,
   workspace: RailsWorkspace

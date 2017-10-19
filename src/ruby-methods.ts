@@ -2,6 +2,10 @@ import * as vscode from 'vscode';
 
 const defReg = /def\s+(\w+)/g;
 
+/**
+ * Given a document and a line, walk up the document to find a method definiton.
+ * We assume that's the method we're in.
+ */
 export function getLastMethodName(
   document: vscode.TextDocument,
   line: number
@@ -16,6 +20,10 @@ export function getLastMethodName(
   }
 }
 
+/**
+ * Find all methods names in the document. This is a simple regex search, so it
+ * returns everything matching 'def ...'
+ */
 export function getAllMethodNames(document: vscode.TextDocument): string[] {
   const text = document.getText();
   const names: string[] = [];

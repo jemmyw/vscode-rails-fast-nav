@@ -19,6 +19,9 @@ function getRailsRoot(filename: string): string {
   }
 }
 
+/**
+ * Information about the file that is currently open in the editor.
+ */
 export class RailsFile {
   private _parsed: path.ParsedPath;
   private _railsRoot: string;
@@ -97,6 +100,9 @@ export class RailsFile {
   }
 }
 
+/**
+ * Turn the current active editor into a RailsFile instance
+ */
 export function getCurrentRailsFile(): RailsFile {
   const editor = vscode.window.activeTextEditor;
   const activeSelection = editor.selection.active;

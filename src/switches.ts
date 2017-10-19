@@ -8,6 +8,9 @@ function existsFilter(switchFile: SwitchFile): boolean {
   return Boolean(switchFile.checkedExists);
 }
 
+/**
+ * Given a list of switch files, return the ones that exist on the filesystem
+ */
 export async function checkSwitchFiles(
   switchFiles: SwitchFile[] | Promise<SwitchFile[]>
 ): Promise<CheckedSwitchFile[]> {
@@ -16,6 +19,9 @@ export async function checkSwitchFiles(
   )).filter(existsFilter) as CheckedSwitchFile[];
 }
 
+/**
+ * Get the switch files (that exist) from a given rule
+ */
 export async function getSwitchesFromRule(
   rule: SwitchRule,
   railsFile: RailsFile
@@ -25,6 +31,10 @@ export async function getSwitchesFromRule(
   return checkSwitchFiles(switchFiles);
 }
 
+/**
+ * Get the switch files (that exist) from a set of rules
+ * 
+ */
 export async function getSwitchesFromRules(
   rules: SwitchRule[],
   railsFile: RailsFile
@@ -36,10 +46,18 @@ export async function getSwitchesFromRules(
   return checkSwitchFiles(switchFiles);
 }
 
+/**
+ * Check to see if a switch file exists. If it has already been checked return
+ * true, otherwise look to the filesystem.
+ */
 async function switchFileExists(switchFile: SwitchFile): Promise<boolean> {
   return switchFile.checkedExists || fs.pathExists(switchFile.filename);
 }
 
+/**
+ * Check to see if a switch file exists and return the switch file with
+ * `checkedExists` filled in.
+ */
 async function checkSwitchFile(
   switchFile: OrPromise<SwitchFile>
 ): Promise<SwitchFile> {
@@ -51,6 +69,9 @@ async function checkSwitchFile(
   };
 }
 
+/**
+ * Return all available switch files using the preset rules.
+ */
 export async function getCheckedSwitches(
   railsFile: RailsFile
 ): Promise<CheckedSwitchFile[]> {
