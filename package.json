@@ -4,7 +4,16 @@
     "description": "Ruby on Rails Navigation",
     "version": "1.1.0",
     "publisher": "jemmyw",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jemmyw/vscode-rails-fast-nav.git"
+    },
     "icon": "images/icon.png",
+    "author": {
+        "name": "Jeremy Wells"
+    },
+    "license": "MIT",
+    "homepage": "https://marketplace.visualstudio.com/items?itemName=jemmyw.rails-fast-nav",
     "engines": {
         "vscode": "^1.17.0"
     },
