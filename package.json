@@ -2,7 +2,7 @@
     "name": "rails-fast-nav",
     "displayName": "Rails Fast Nav",
     "description": "Ruby on Rails Navigation",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "publisher": "jemmyw",
     "repository": {
         "type": "git",
@@ -34,6 +34,10 @@
             {
                 "command": "rails.switchToView",
                 "title": "Rails: Switch to View"
+            },
+            {
+                "command": "rails.switchToController",
+                "title": "Rails: Switch to Controller"
             },
             {
                 "command": "rails.switchToModel",
