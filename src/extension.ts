@@ -10,6 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
       `rails.${name}`,
       command
     );
+
     context.subscriptions.push(disposable);
   });
 }

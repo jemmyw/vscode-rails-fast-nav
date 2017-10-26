@@ -22,13 +22,21 @@ export async function checkSwitchFiles(
 /**
  * Get the switch files (that exist) from a given rule
  */
-export async function getSwitchesFromRule(
+export function getSwitchesFromRule(rule:SwitchRule):(railsFile:RailsFile) => Promise<CheckedSwitchFile[]>;
+export function getSwitchesFromRule(rule:SwitchRule, railsFile:RailsFile):Promise<CheckedSwitchFile[]>;
+
+export function getSwitchesFromRule(
   rule: SwitchRule,
-  railsFile: RailsFile
-): Promise<CheckedSwitchFile[]> {
-  const workspace = await RailsWorkspaceCache.fetch(railsFile.railsRoot);
-  const switchFiles = rule(railsFile, workspace);
-  return checkSwitchFiles(switchFiles);
+  railsFile?: RailsFile
+): any {
+  const fn = async function(railsFile:RailsFile) {
+    const workspace = await RailsWorkspaceCache.fetch(railsFile.railsRoot);
+    const switchFiles = rule(railsFile, workspace);
+    return checkSwitchFiles(switchFiles);
+  }
+
+  if (railsFile) { return fn(railsFile); }
+  return fn;
 }
 
 /**

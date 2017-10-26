@@ -32,16 +32,17 @@ suite('Extension Tests', function() {
       c.startsWith('rails.')
     );
 
-    [
+    for (let command of [
       'fastNavigation',
       'switchToView',
       'switchToModel',
       'switchToSpec',
       'switchToTest',
-    ].forEach(command =>
-      expect(commands, 'to have an item satisfying to be', `rails.${command}`)
-    );
-  });
+      'createView',
+    ]) {
+      expect(commands, 'to have an item satisfying to be', `rails.${command}`);
+    }
+  }).timeout(5000);
 
   test('switch to model', async () => {
     await openFile('app/controllers/cats_controller.rb');

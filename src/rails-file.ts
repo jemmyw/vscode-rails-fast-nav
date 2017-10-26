@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as vscode from 'vscode';
 import { getAllMethodNames, getLastMethodName } from './ruby-methods';
+import { classify } from 'inflected';
 
 function isRailsRoot(filename: string): boolean {
   const railsBin = path.join(filename, 'bin', 'rails');
@@ -37,6 +38,12 @@ export class RailsFile {
     this._inApp = path
       .relative(this._railsRoot, _filename)
       .startsWith('app' + path.sep);
+  }
+
+  get classname(): string {
+    return classify(
+      path.basename(this._filename, this._parsed.ext)
+    )
   }
 
   get filename(): string {
@@ -91,10 +98,18 @@ export class RailsFile {
     return this._methods;
   }
 
-  isInAppDir(dir:string) { return this.fileType === dir; }
-  isController() { return this.isInAppDir('controllers'); }
-  isModel() { return this.isInAppDir('models'); }
-  isView() { return this.isInAppDir('views'); }
+  isInAppDir(dir: string) {
+    return this.fileType === dir;
+  }
+  isController() {
+    return this.isInAppDir('controllers');
+  }
+  isModel() {
+    return this.isInAppDir('models');
+  }
+  isView() {
+    return this.isInAppDir('views');
+  }
   isTest() {
     return this.fileType === 'spec' || this.fileType === 'test';
   }
@@ -103,8 +118,12 @@ export class RailsFile {
 /**
  * Turn the current active editor into a RailsFile instance
  */
-export function getCurrentRailsFile(): RailsFile {
+export function getCurrentRailsFile(): RailsFile | null {
   const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return null;
+  }
+
   const activeSelection = editor.selection.active;
   const filename = editor.document.fileName;
 

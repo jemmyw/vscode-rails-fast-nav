@@ -122,3 +122,18 @@ export function relativeToAppDir(
 ): string {
   return path.relative(workspace.appPath, railsFile.filename);
 }
+
+/**
+ * Get the view path of a controller
+ */
+export function getViewPath(railsFile: RailsFile, workspace: RailsWorkspace) {
+  const justName = railsFile.basename
+    .split('_')
+    .slice(0, -1)
+    .join('_');
+  return path.join(
+    workspace.viewsPath,
+    locationWithinAppLocation(railsFile, workspace),
+    justName
+  );
+}

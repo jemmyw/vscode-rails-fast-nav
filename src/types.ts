@@ -9,7 +9,7 @@ export interface SwitchFile {
 }
 
 export interface CheckedSwitchFile extends SwitchFile {
-  checkedExists: true
+  checkedExists: true;
 }
 
 export type OrPromise<T> = T | Promise<T>;

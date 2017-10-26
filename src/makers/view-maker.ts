@@ -1,6 +1,6 @@
 import { SwitchFile } from '../types';
 import { RailsFile } from '../rails-file';
-import { RailsWorkspace, locationWithinAppLocation } from '../rails-workspace';
+import { RailsWorkspace, getViewPath } from '../rails-workspace';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 
@@ -20,15 +20,11 @@ export async function viewMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
-  const justName = railsFile.basename
-    .split('_')
-    .slice(0, -1)
-    .join('_');
-  const viewPath = path.join(
-    workspace.viewsPath,
-    locationWithinAppLocation(railsFile, workspace),
-    justName
-  );
+  const viewPath = getViewPath(railsFile, workspace);
+
+  if (!await fs.pathExists(viewPath)) {
+    return [];
+  }
 
   const files = await fs.readdir(viewPath);
 

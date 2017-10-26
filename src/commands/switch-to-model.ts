@@ -5,12 +5,10 @@ import { getSwitchesFromRule } from '../switches';
 import { openFile, showPicker } from './util';
 
 export async function switchToModel() {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
+  const railsFile = getCurrentRailsFile();
+  if (!railsFile) {
     return;
   }
-
-  const railsFile = getCurrentRailsFile();
   if (railsFile.isModel()) {
     return;
   }
