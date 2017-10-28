@@ -1,3 +1,6 @@
+## 1.1.4
+- Updated Readme
+
 ## 1.1.3
 - Add Create View command
 
