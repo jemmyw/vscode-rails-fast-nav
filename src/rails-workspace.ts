@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { RailsFile } from './rails-file';
+import { appendWithoutExt } from './path-utils';
 
 /**
  * Some information about a Rails application at a given path.
@@ -113,6 +114,13 @@ export function locationWithinAppLocation(
     .join(path.sep);
 }
 
+export function relativeToRootDir(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  return path.relative(workspace.path, railsFile.filename);
+}
+
 /**
  * Get the relative path to the file from the workspace root
  */
@@ -121,6 +129,18 @@ export function relativeToAppDir(
   workspace: RailsWorkspace
 ): string {
   return path.relative(workspace.appPath, railsFile.filename);
+}
+
+export function getSpecPath(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  const relFn = railsFile.inApp ? relativeToAppDir : relativeToRootDir;
+
+  return path.join(
+    workspace.specPath,
+    appendWithoutExt(relFn(railsFile, workspace), '_spec')
+  );
 }
 
 /**

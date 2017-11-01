@@ -4,6 +4,7 @@ import { switchToModel } from './switch-to-model';
 import { switchToTest } from './switch-to-test';
 import { switchToController } from './switch-to-controller';
 import { createView } from './create-view';
+import { createSpec } from './create-spec';
 
 export const commands = {
   fastNavigation: navigateRails,
@@ -13,4 +14,5 @@ export const commands = {
   switchToSpec: switchToTest,
   switchToController: switchToController,
   createView,
+  createSpec,
 };

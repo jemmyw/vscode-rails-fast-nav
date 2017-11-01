@@ -1,3 +1,6 @@
+## 1.1.5
+- Add Create Spec command
+
 ## 1.1.4
 - Updated Readme
 

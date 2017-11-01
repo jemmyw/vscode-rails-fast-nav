@@ -1,8 +1,8 @@
 import { getViewPath } from '../rails-workspace';
 import { getRailsContext } from '../rails-context';
+import { ensureDocument } from '../path-utils';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs-extra';
 
 export async function createView() {
   return getRailsContext(async function(railsFile, workspace) {
@@ -26,11 +26,7 @@ export async function createView() {
     }
 
     const viewPath = getViewPath(railsFile, workspace);
-    await fs.mkdirp(viewPath);
     const viewFile = path.join(viewPath, viewName);
-    await fs.ensureFile(viewFile);
-
-    const document = await vscode.workspace.openTextDocument(viewFile);
-    await vscode.window.showTextDocument(document);
+    return await ensureDocument(viewFile);
   });
 }

@@ -39,6 +39,7 @@ suite('Extension Tests', function() {
       'switchToSpec',
       'switchToTest',
       'createView',
+      'createSpec',
     ]) {
       expect(commands, 'to have an item satisfying to be', `rails.${command}`);
     }
@@ -78,6 +79,16 @@ suite('Extension Tests', function() {
       vscode.window.activeTextEditor.document.fileName,
       'to end with',
       'spec/models/cat_spec.rb'
+    );
+  });
+
+  test('create spec', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+    await vscode.commands.executeCommand('rails.createSpec');
+    expect(
+      vscode.window.activeTextEditor.document.fileName,
+      'to end with',
+      'spec/controllers/cats_controller_spec.rb'
     );
   });
 });
