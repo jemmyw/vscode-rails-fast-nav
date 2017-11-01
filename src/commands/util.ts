@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { ensureDocument } from '../path-utils';
 import { SwitchFile, OrPromise } from '../types';
 
 interface IndexedQuickPickItem extends vscode.QuickPickItem {
@@ -13,7 +14,7 @@ export function openFile(filename: string) {
     .then(vscode.window.showTextDocument);
 }
 
-export async function createFile(switchFile:SwitchFile) {
+export async function createFile(switchFile: SwitchFile) {
   return openFile(switchFile.filename);
 }
 
@@ -74,5 +75,32 @@ export async function showPicker(
       await openFile(switchFile.filename);
     }
     return switchFile;
+  }
+}
+
+export async function showYesNo(message: string): Promise<boolean> {
+  const yesItem: vscode.MessageItem = {
+    title: 'Yes',
+  };
+  const noItem: vscode.MessageItem = {
+    title: 'No',
+    isCloseAffordance: true,
+  };
+
+  const response = await vscode.window.showInformationMessage(
+    message,
+    yesItem,
+    noItem
+  );
+  return response === yesItem;
+}
+
+export async function showCreateFile(filename: string): Promise<void> {
+  const root = vscode.workspace.workspaceFolders[0].uri.fsPath;
+  const display = path.relative(root, filename);
+  const message = `Create ${display}`;
+
+  if (await showYesNo(message)) {
+    return ensureDocument(filename);
   }
 }

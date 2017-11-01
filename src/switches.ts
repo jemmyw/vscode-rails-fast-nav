@@ -22,36 +22,57 @@ export async function checkSwitchFiles(
 /**
  * Get the switch files (that exist) from a given rule
  */
-export function getSwitchesFromRule(rule:SwitchRule):(railsFile:RailsFile) => Promise<CheckedSwitchFile[]>;
-export function getSwitchesFromRule(rule:SwitchRule, railsFile:RailsFile):Promise<CheckedSwitchFile[]>;
+export function getSwitchesFromRule(
+  rule: SwitchRule
+): (railsFile: RailsFile) => Promise<CheckedSwitchFile[]>;
+export function getSwitchesFromRule(
+  rule: SwitchRule,
+  railsFile: RailsFile
+): Promise<CheckedSwitchFile[]>;
 
 export function getSwitchesFromRule(
   rule: SwitchRule,
   railsFile?: RailsFile
 ): any {
-  const fn = async function(railsFile:RailsFile) {
+  const fn = async function(railsFile: RailsFile) {
     const workspace = await RailsWorkspaceCache.fetch(railsFile.railsRoot);
     const switchFiles = rule(railsFile, workspace);
     return checkSwitchFiles(switchFiles);
-  }
+  };
 
-  if (railsFile) { return fn(railsFile); }
+  if (railsFile) {
+    return fn(railsFile);
+  }
   return fn;
 }
 
 /**
  * Get the switch files (that exist) from a set of rules
- * 
  */
 export async function getSwitchesFromRules(
   rules: SwitchRule[],
   railsFile: RailsFile
-): Promise<CheckedSwitchFile[]> {
+): Promise<CheckedSwitchFile[]>;
+export async function getSwitchesFromRules(
+  rules: SwitchRule[],
+  railsFile: RailsFile,
+  checked: true
+): Promise<SwitchFile[]>;
+export async function getSwitchesFromRules(
+  rules: SwitchRule[],
+  railsFile: RailsFile,
+  checked: false
+): Promise<CheckedSwitchFile[]>;
+export async function getSwitchesFromRules(
+  rules: SwitchRule[],
+  railsFile: RailsFile,
+  checked: boolean = true
+): Promise<any[]> {
   const workspace = await RailsWorkspaceCache.fetch(railsFile.railsRoot);
   const switchFiles = Promise.all(
     rules.map(rule => rule(railsFile, workspace))
   ).then(switches => [].concat(...switches));
-  return checkSwitchFiles(switchFiles);
+  return checked ? checkSwitchFiles(switchFiles) : switchFiles;
 }
 
 /**

@@ -1,3 +1,6 @@
+## 1.1.7
+- Add Switch to Fixture command
+
 ## 1.1.6
 - When switching to spec or test, ask to create the file if it does not exist
 

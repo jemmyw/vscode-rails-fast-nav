@@ -7,6 +7,7 @@ import {
   viewMaker,
   specMaker,
   testMaker,
+  fixtureMaker,
 } from './makers';
 
 function switchRule(matcher: SwitchMatcher, maker: SwitchMaker): SwitchRule {
@@ -30,4 +31,5 @@ export const rules = [
   switchRule(f => !f.isModel(), modelMaker),
   switchRule(f => f.isController(), viewMaker),
   switchRule(f => f.isModel() || f.isView(), controllerMaker),
+  switchRule(f => !f.isFixture(), fixtureMaker),
 ];

@@ -41,9 +41,7 @@ export class RailsFile {
   }
 
   get classname(): string {
-    return classify(
-      path.basename(this._filename, this._parsed.ext)
-    )
+    return classify(path.basename(this._filename, this._parsed.ext));
   }
 
   get filename(): string {
@@ -73,6 +71,10 @@ export class RailsFile {
 
       if (this._parsed.name.endsWith('_test')) {
         return 'test';
+      }
+
+      if (this.dirname.endsWith('fixtures')) {
+        return 'fixture';
       }
 
       if (this._parsed.ext === '.rb') {
@@ -112,6 +114,9 @@ export class RailsFile {
   }
   isTest() {
     return this.fileType === 'spec' || this.fileType === 'test';
+  }
+  isFixture() {
+    return this.fileType === 'fixture';
   }
 }
 

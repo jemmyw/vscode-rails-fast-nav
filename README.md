@@ -9,7 +9,9 @@ Commands to move between files in a Rails application.
 * Switch to controller [command.railsSwitchToController]
 * Switch to view [command.railsFastSwitchToView]
 * Switch to test/spec [command.railsFastSwitchToTest] + alias [command.railsFastSwitchToSpec]
+* Switch to fixture [command.railsFastSwitchToFixture]
 * Create View [command.railsCreateView]
+* Create Spec [command.railsCreateSpec]
 
 ## Screenshot
 ![Example](images/railsnav.gif)
