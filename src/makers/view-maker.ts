@@ -20,7 +20,7 @@ export async function viewMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
-  const viewPath = getViewPath(railsFile, workspace);
+  const viewPath = getViewPath(workspace, railsFile);
 
   if (!await fs.pathExists(viewPath)) {
     return [];

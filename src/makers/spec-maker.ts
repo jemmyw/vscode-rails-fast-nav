@@ -12,7 +12,7 @@ export function specMaker(
     {
       filename: path.join(
         workspace.specPath,
-        appendWithoutExt(relativeToAppDir(railsFile, workspace), '_spec')
+        appendWithoutExt(relativeToAppDir(workspace, railsFile.filename), '_spec')
       ),
       title: 'Spec file',
       type: 'spec',

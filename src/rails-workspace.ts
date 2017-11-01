@@ -108,45 +108,87 @@ export function locationWithinAppLocation(
   workspace: RailsWorkspace
 ): string {
   return path
-    .dirname(relativeToAppDir(railsFile, workspace))
+    .dirname(relativeToAppDir(workspace, railsFile.filename))
     .split(path.sep)
     .slice(1)
     .join(path.sep);
 }
 
 export function relativeToRootDir(
-  railsFile: RailsFile,
   workspace: RailsWorkspace
-): string {
-  return path.relative(workspace.path, railsFile.filename);
+): (filename: string) => string;
+export function relativeToRootDir(
+  workspace: RailsWorkspace,
+  filename: string
+): string;
+export function relativeToRootDir(
+  workspace: RailsWorkspace,
+  filename?: string
+) {
+  if (!filename) {
+    return filename => relativeToRootDir(workspace, filename);
+  }
+  return path.relative(workspace.path, filename);
 }
 
 /**
  * Get the relative path to the file from the workspace root
  */
 export function relativeToAppDir(
+  workspace: RailsWorkspace
+): (filename: string) => string;
+export function relativeToAppDir(
+  workspace: RailsWorkspace,
+  filename: string
+): string;
+export function relativeToAppDir(workspace: RailsWorkspace, filename?: string) {
+  if (!filename) {
+    return filename => relativeToAppDir(workspace, filename);
+  }
+  return path.relative(workspace.appPath, filename);
+}
+
+export async function getTestFile(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): Promise<string> {
+  const specs = await workspace.hasSpecs();
+  const fn = specs ? getSpecPath : getTestPath;
+  return fn(railsFile, workspace);
+}
+
+export function getTestPath(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): string {
-  return path.relative(workspace.appPath, railsFile.filename);
+  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
+    workspace
+  );
+
+  return path.join(
+    workspace.specPath,
+    appendWithoutExt(relFn(railsFile.filename), '_spec')
+  );
 }
 
 export function getSpecPath(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): string {
-  const relFn = railsFile.inApp ? relativeToAppDir : relativeToRootDir;
+  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
+    workspace
+  );
 
   return path.join(
     workspace.specPath,
-    appendWithoutExt(relFn(railsFile, workspace), '_spec')
+    appendWithoutExt(relFn(railsFile.filename), '_spec')
   );
 }
 
 /**
  * Get the view path of a controller
  */
-export function getViewPath(railsFile: RailsFile, workspace: RailsWorkspace) {
+export function getViewPath(workspace:RailsWorkspace, railsFile: RailsFile) {
   const justName = railsFile.basename
     .split('_')
     .slice(0, -1)

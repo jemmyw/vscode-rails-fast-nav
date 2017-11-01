@@ -1,3 +1,6 @@
+## 1.1.6
+- When switching to spec or test, ask to create the file if it does not exist
+
 ## 1.1.5
 - Add Create Spec command
 

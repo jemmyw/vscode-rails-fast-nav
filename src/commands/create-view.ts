@@ -25,7 +25,7 @@ export async function createView() {
       return;
     }
 
-    const viewPath = getViewPath(railsFile, workspace);
+    const viewPath = getViewPath(workspace, railsFile);
     const viewFile = path.join(viewPath, viewName);
     return await ensureDocument(viewFile);
   });

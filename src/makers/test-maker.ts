@@ -11,7 +11,7 @@ export function testMaker(
   return [{
     filename: path.join(
       workspace.testPath,
-      appendWithoutExt(relativeToAppDir(railsFile, workspace), '_test')
+      appendWithoutExt(relativeToAppDir(workspace, railsFile.filename), '_test')
     ),
     title: 'Test file',
     type: 'test',

@@ -1,30 +1,42 @@
 import * as vscode from 'vscode';
-import { getCurrentRailsFile } from '../rails-file';
+import { getRailsContext } from '../rails-context';
 import { testMaker, specMaker } from '../makers';
-import { getSwitchesFromRules } from '../switches';
 import { openFile, showPicker } from './util';
+import { getTestFile, relativeToRootDir } from '../rails-workspace';
+import { ensureDocument } from '../path-utils';
 
 export async function switchToTest() {
-  const railsFile = getCurrentRailsFile();
-  if (!railsFile) {
-    return;
-  }
-  if (railsFile.isTest()) {
-    return;
-  }
+  return getRailsContext([testMaker, specMaker], async function(railsFile, workspace, switchFiles) {
+    if (railsFile.isTest()) {
+      return;
+    }
 
-  const switchFiles = await getSwitchesFromRules(
-    [testMaker, specMaker],
-    railsFile
-  );
+    if (switchFiles.length === 0) {
+      const yesItem: vscode.MessageItem = {
+        title: 'Yes',
+      };
+      const noItem: vscode.MessageItem = {
+        title: 'No',
+        isCloseAffordance: true,
+      };
 
-  if (switchFiles.length === 0) {
-    return await vscode.window.showInformationMessage('No test or spec found');
-  }
+      const testFilePath = await getTestFile(railsFile, workspace);
+      const testFileDisplay = relativeToRootDir(workspace, testFilePath);
 
-  if (switchFiles.length === 1) {
-    return openFile(switchFiles[0].filename);
-  } else {
-    return showPicker(railsFile.railsRoot, switchFiles);
-  }
+      const response = await vscode.window.showInformationMessage(
+        `Create ${testFileDisplay}?`,
+        yesItem,
+        noItem
+      );
+      if (response === yesItem) {
+        return await ensureDocument(testFilePath);
+      }
+    }
+
+    if (switchFiles.length === 1) {
+      return openFile(switchFiles[0].filename);
+    } else {
+      return showPicker(railsFile.railsRoot, switchFiles);
+    }
+  });
 }
