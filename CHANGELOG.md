@@ -1,3 +1,6 @@
+## 1.1.8
+- Switch to test/spec command switches back to original file if in test editor
+
 ## 1.1.7
 - Add Switch to Fixture command
 
