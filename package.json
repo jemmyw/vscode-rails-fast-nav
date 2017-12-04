@@ -31,7 +31,10 @@
             "title": "Rails Fast Navigation Configuration",
             "properties": {
                 "rails.appDir": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Absolute or relative (to first workspace root) path to Rails app directory"
                 }
             }
@@ -95,9 +98,9 @@
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
         "ineeda": "^0.11.0",
-        "typescript": "^2.5.3",
+        "typescript": "^2.6.2",
         "unexpected": "^10.36.0",
-        "vscode": "^1.1.5"
+        "vscode": "^1.1.9"
     },
     "dependencies": {
         "fs-extra": "^4.0.2",
