@@ -15,3 +15,11 @@ Commands to move between files in a Rails application.
 
 ## Screenshot
 ![Example](images/railsnav.gif)
+
+## Configuration
+
+Set the Rails `app` directory if you have a non-standard directory layout:
+
+```json
+"rails.appDir": "lib/app"
+```

@@ -1,3 +1,7 @@
+## 1.1.10
+- Customizable app directory with `rails.appDir`
+- Discover correct controller when controllers are in modules
+
 ## 1.1.8
 - Switch to test/spec command switches back to original file if in test editor
 
