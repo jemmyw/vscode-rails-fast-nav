@@ -18,7 +18,7 @@ export async function switchToController() {
 
   if (switchFiles.length === 0) {
     return await vscode.window.showInformationMessage(
-      'No model found for this file'
+      'No controller found for this file'
     );
   }
 

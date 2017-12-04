@@ -1,0 +1,2 @@
+class LionsController < ApplicationController
+end

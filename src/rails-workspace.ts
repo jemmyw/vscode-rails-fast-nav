@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { RailsFile } from './rails-file';
 import { appendWithoutExt } from './path-utils';
 
@@ -19,7 +20,9 @@ export class RailsWorkspace {
   }
 
   get appPath(): string {
-    return path.join(this.path, 'app');
+    const appDir = vscode.workspace.getConfiguration('rails').appDir || 'app';
+    console.log(appDir);
+    return path.resolve(this.path, appDir);
   }
 
   get specPath(): string {
@@ -104,11 +107,11 @@ export const RailsWorkspaceCache = {
  * we're looking for a spec that becomes 'spec/subdir/model_spec.rb'`
  */
 export function locationWithinAppLocation(
-  railsFile: RailsFile,
+  filename: string,
   workspace: RailsWorkspace
 ): string {
   return path
-    .dirname(relativeToAppDir(workspace, railsFile.filename))
+    .dirname(relativeToAppDir(workspace, filename))
     .split(path.sep)
     .slice(1)
     .join(path.sep);
@@ -195,7 +198,7 @@ export function getViewPath(workspace:RailsWorkspace, railsFile: RailsFile) {
     .join('_');
   return path.join(
     workspace.viewsPath,
-    locationWithinAppLocation(railsFile, workspace),
+    locationWithinAppLocation(railsFile.filename, workspace),
     justName
   );
 }

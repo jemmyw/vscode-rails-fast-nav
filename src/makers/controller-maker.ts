@@ -1,11 +1,13 @@
 import { RailsFile } from '../rails-file';
-import { RailsWorkspace } from '../rails-workspace';
+import { RailsWorkspace, locationWithinAppLocation } from '../rails-workspace';
 import { SwitchFile } from '../types';
 import { pluralize } from 'inflected';
 import * as path from 'path';
 
-function getControllerNameFromView(railsFile): string {
-  return path.basename(path.dirname(railsFile.filename)) + '_controller.rb';
+function getControllerNameFromView(railsFile:RailsFile, workspace:RailsWorkspace): string {
+  const location = locationWithinAppLocation(path.dirname(railsFile.filename), workspace);
+  const controllerName = path.basename(path.dirname(railsFile.filename)) + '_controller.rb';
+  return path.join(location, controllerName);
 }
 
 function getControllerNameFromModel(railsFile): string {
@@ -16,9 +18,9 @@ function getControllerNameFromModel(railsFile): string {
   );
 }
 
-function getControllerName(railsFile: RailsFile): string {
+function getControllerName(railsFile: RailsFile, workspace:RailsWorkspace): string {
   if (railsFile.isView()) {
-    return getControllerNameFromView(railsFile);
+    return getControllerNameFromView(railsFile, workspace);
   } else {
     return getControllerNameFromModel(railsFile);
   }
@@ -28,7 +30,7 @@ export async function controllerMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
-  const controllerName = getControllerName(railsFile);
+  const controllerName = getControllerName(railsFile, workspace);
 
   if (controllerName) {
     return [

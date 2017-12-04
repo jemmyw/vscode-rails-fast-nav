@@ -27,7 +27,7 @@ export async function modelMaker(
   const singularName = singularize(justName(railsFile));
   let location = path.join(
     workspace.modelsPath,
-    locationWithinAppLocation(railsFile, workspace)
+    locationWithinAppLocation(railsFile.filename, workspace)
   );
 
   while (insideDir(workspace.modelsPath, location)) {

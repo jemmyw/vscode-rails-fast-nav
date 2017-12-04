@@ -20,6 +20,10 @@ async function openFile(filename: string) {
   );
 }
 
+function expectProjectFile(name: string) {
+  expect(vscode.window.activeTextEditor.document.fileName, 'to end with', name);
+}
+
 suite('Extension Tests', function() {
   setup(async () => {
     await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
@@ -43,7 +47,7 @@ suite('Extension Tests', function() {
     ]) {
       expect(commands, 'to have an item satisfying to be', `rails.${command}`);
     }
-  }).timeout(5000);
+  }).timeout(60000);
 
   test('switch to model', async () => {
     await openFile('app/controllers/cats_controller.rb');
@@ -70,6 +74,18 @@ suite('Extension Tests', function() {
       'to end with',
       'app/views/cats/show.js.erb'
     );
+  });
+
+  test('switch to controller', async () => {
+    await openFile('app/views/cats/_cat.html.erb');
+    await vscode.commands.executeCommand('rails.switchToController');
+    expectProjectFile('app/controllers/cats_controller.rb');
+  });
+
+  test('switch to module controller', async () => {
+    await openFile('app/views/big/lions/new.html.erb');
+    await vscode.commands.executeCommand('rails.switchToController');
+    expectProjectFile('app/controllers/big/lions_controller.rb');
   });
 
   test('switch to spec', async () => {
