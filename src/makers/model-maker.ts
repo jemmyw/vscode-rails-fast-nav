@@ -32,7 +32,6 @@ export async function modelMaker(
 
   while (insideDir(workspace.modelsPath, location)) {
     const modelPath = path.join(location, singularName + '.rb');
-    console.log(modelPath);
 
     if (await fs.pathExists(modelPath)) {
       return [

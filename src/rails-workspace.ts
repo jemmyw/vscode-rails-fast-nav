@@ -21,7 +21,6 @@ export class RailsWorkspace {
 
   get appPath(): string {
     const appDir = vscode.workspace.getConfiguration('rails').appDir || 'app';
-    console.log(appDir);
     return path.resolve(this.path, appDir);
   }
 
