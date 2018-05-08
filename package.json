@@ -98,7 +98,6 @@
         "@types/inflected": "^1.1.29",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "ineeda": "^0.11.0",
         "typescript": "^2.6.2",
         "unexpected": "^10.36.0",
         "vscode": "^1.1.9"
