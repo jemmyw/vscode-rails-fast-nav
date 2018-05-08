@@ -29,7 +29,7 @@ export class RailsWorkspace {
   }
 
   get testPath(): string {
-    return path.join(this.path, 'tests');
+    return path.join(this.path, 'test');
   }
 
   get controllersPath(): string {
