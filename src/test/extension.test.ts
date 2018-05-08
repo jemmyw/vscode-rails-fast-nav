@@ -12,7 +12,7 @@ import * as vscode from 'vscode';
 // import * as myExtension from '../extension';
 import * as path from 'path';
 
-const projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+let projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
 async function openFile(filename: string) {
   await vscode.window.showTextDocument(
