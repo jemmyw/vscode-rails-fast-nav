@@ -1,3 +1,6 @@
+## 1.2.0
+- [jordanbrock] Fixes the test directory name, tests -> test
+
 ## 1.1.10
 - Customizable app directory with `rails.appDir`
 - Discover correct controller when controllers are in modules
