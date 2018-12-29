@@ -2,7 +2,7 @@
     "name": "rails-fast-nav",
     "displayName": "Rails Fast Nav",
     "description": "Ruby on Rails Navigation",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "publisher": "jemmyw",
     "repository": {
         "type": "git",

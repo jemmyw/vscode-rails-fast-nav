@@ -1,3 +1,6 @@
+## 1.2.1
+- Activation now happens for **/bin/rails so that nested Rails apps are detected
+
 ## 1.2.0
 - [jordanbrock] Fixes the test directory name, tests -> test
 
