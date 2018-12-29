@@ -21,8 +21,8 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:bin/rails",
-        "workspaceContains:script/rails"
+        "workspaceContains:**/bin/rails",
+        "workspaceContains:**/script/rails"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -31,10 +31,8 @@
             "title": "Rails Fast Navigation Configuration",
             "properties": {
                 "rails.appDir": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": "string",
+                    "default": "",
                     "description": "Absolute or relative (to first workspace root) path to Rails app directory"
                 }
             }
