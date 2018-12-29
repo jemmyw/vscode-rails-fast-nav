@@ -94,16 +94,16 @@
         "copyTestProject": "cp -r src/test/project/* out/test"
     },
     "devDependencies": {
-        "@types/fs-extra": "^5.0.2",
+        "@types/fs-extra": "^5.0.4",
         "@types/inflected": "^1.1.29",
         "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "typescript": "^2.8.3",
-        "unexpected": "^10.37.7",
-        "vscode": "^1.1.17"
+        "@types/node": "^10.12.18",
+        "typescript": "^3.2.2",
+        "unexpected": "^10.40.0",
+        "vscode": "^1.1.26"
     },
     "dependencies": {
-        "fs-extra": "^6.0.0",
+        "fs-extra": "^7.0.1",
         "inflected": "^2.0.2"
     }
 }
