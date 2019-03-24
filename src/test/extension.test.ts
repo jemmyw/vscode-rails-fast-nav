@@ -82,6 +82,12 @@ suite('Extension Tests', function() {
     expectProjectFile('app/controllers/cats_controller.rb');
   });
 
+  test('switch to module fixture', async () => {
+    await openFile('app/models/big/lion.rb');
+    await vscode.commands.executeCommand('rails.switchToFixture');
+    expectProjectFile('spec/fixtures/big_lions.yml');
+  });
+
   test('switch to module controller', async () => {
     await openFile('app/views/big/lions/new.html.erb');
     await vscode.commands.executeCommand('rails.switchToController');

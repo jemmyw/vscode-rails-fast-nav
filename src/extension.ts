@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { commands } from './commands';
+import { RailsWorkspaceCache } from './rails-workspace';
 
 export function activate(context: vscode.ExtensionContext) {
   Object.keys(commands).forEach(name => {
@@ -15,4 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
   });
 }
 
-export function deactivate() {}
+export function deactivate() {
+  if (RailsWorkspaceCache) {
+    RailsWorkspaceCache.dispose();
+  }
+}

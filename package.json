@@ -1,107 +1,129 @@
 {
-    "name": "rails-fast-nav",
-    "displayName": "Rails Fast Nav",
-    "description": "Ruby on Rails Navigation",
-    "version": "1.2.1",
-    "publisher": "jemmyw",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jemmyw/vscode-rails-fast-nav.git"
+  "name": "rails-fast-nav",
+  "displayName": "Rails Fast Nav",
+  "description": "Ruby on Rails Navigation",
+  "version": "1.3.0",
+  "publisher": "jemmyw",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jemmyw/vscode-rails-fast-nav.git"
+  },
+  "icon": "images/icon.png",
+  "author": {
+    "name": "Jeremy Wells"
+  },
+  "license": "MIT",
+  "homepage": "https://marketplace.visualstudio.com/items?itemName=jemmyw.rails-fast-nav",
+  "engines": {
+    "vscode": "^1.17.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/bin/rails",
+    "workspaceContains:**/script/rails"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Rails Fast Navigation Configuration",
+      "properties": {
+        "rails.appDir": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute or relative (to first workspace root) path to Rails app directory"
+        }
+      }
     },
-    "icon": "images/icon.png",
-    "author": {
-        "name": "Jeremy Wells"
-    },
-    "license": "MIT",
-    "homepage": "https://marketplace.visualstudio.com/items?itemName=jemmyw.rails-fast-nav",
-    "engines": {
-        "vscode": "^1.17.0"
-    },
-    "categories": [
-        "Other"
+    "commands": [
+      {
+        "command": "rails.fastNavigation",
+        "title": "Rails: Fast Navigation"
+      },
+      {
+        "command": "rails.switchToView",
+        "title": "Rails: Switch to View"
+      },
+      {
+        "command": "rails.switchToController",
+        "title": "Rails: Switch to Controller"
+      },
+      {
+        "command": "rails.switchToModel",
+        "title": "Rails: Switch to Model"
+      },
+      {
+        "command": "rails.switchToTest",
+        "title": "Rails: Switch to Test"
+      },
+      {
+        "command": "rails.switchToSpec",
+        "title": "Rails: Switch to Spec"
+      },
+      {
+        "command": "rails.switchToFixture",
+        "title": "Rails: Switch to Fixture"
+      },
+      {
+        "command": "rails.createView",
+        "title": "Rails: Create View"
+      },
+      {
+        "command": "rails.createSpec",
+        "title": "Rails: Create Spec"
+      }
     ],
-    "activationEvents": [
-        "workspaceContains:**/bin/rails",
-        "workspaceContains:**/script/rails"
-    ],
-    "main": "./out/extension",
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "Rails Fast Navigation Configuration",
-            "properties": {
-                "rails.appDir": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Absolute or relative (to first workspace root) path to Rails app directory"
-                }
-            }
-        },
-        "commands": [
-            {
-                "command": "rails.fastNavigation",
-                "title": "Rails: Fast Navigation"
-            },
-            {
-                "command": "rails.switchToView",
-                "title": "Rails: Switch to View"
-            },
-            {
-                "command": "rails.switchToController",
-                "title": "Rails: Switch to Controller"
-            },
-            {
-                "command": "rails.switchToModel",
-                "title": "Rails: Switch to Model"
-            },
-            {
-                "command": "rails.switchToTest",
-                "title": "Rails: Switch to Test"
-            },
-            {
-                "command": "rails.switchToSpec",
-                "title": "Rails: Switch to Spec"
-            },
-            {
-                "command": "rails.switchToFixture",
-                "title": "Rails: Switch to Fixture"
-            },
-            {
-                "command": "rails.createView",
-                "title": "Rails: Create View"
-            },
-            {
-                "command": "rails.createSpec",
-                "title": "Rails: Create Spec"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "rails.fastNavigation",
-                "key": "alt+r",
-                "when": "editorTextFocus"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
-        "copyTestProject": "cp -r src/test/project/* out/test"
-    },
-    "devDependencies": {
-        "@types/fs-extra": "^5.0.4",
-        "@types/inflected": "^1.1.29",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^10.12.18",
-        "typescript": "^3.2.2",
-        "unexpected": "^10.40.0",
-        "vscode": "^1.1.26"
-    },
-    "dependencies": {
-        "fs-extra": "^7.0.1",
-        "inflected": "^2.0.2"
-    }
+    "keybindings": [
+      {
+        "command": "rails.fastNavigation",
+        "key": "alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToModel",
+        "key": "alt+m",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToController",
+        "key": "alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToView",
+        "key": "alt+v",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToTest",
+        "key": "alt+y",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
+    "copyTestProject": "cp -r src/test/project/* out/test"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "@types/glob": "^7.1.1",
+    "@types/inflected": "^1.1.29",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^10.12.18",
+    "typescript": "^3.2.2",
+    "unexpected": "^10.40.0",
+    "vscode": "^1.1.26"
+  },
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "glob": "^7.1.3",
+    "inflected": "^2.0.2"
+  }
 }

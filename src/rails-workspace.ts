@@ -1,17 +1,19 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import * as glob from 'glob';
 import { RailsFile } from './rails-file';
 import { appendWithoutExt } from './path-utils';
 
 /**
  * Some information about a Rails application at a given path.
- * 
+ *
  * @export
  * @class RailsWorkspace
  */
 export class RailsWorkspace {
   private _knownFiles: { [index: string]: boolean } = {};
+  private _models: RailsFile[] = null;
 
   constructor(private _path: string) {}
 
@@ -71,36 +73,76 @@ export class RailsWorkspace {
   pathIn(filePath: string): boolean {
     return filePath.startsWith(this.path);
   }
+
+  async getModels() {
+    if (this._models) return this._models;
+
+    const modelFiles = await new Promise<string[]>((res, rej) =>
+      glob(this.modelsPath + '/**/*.rb', (err, m) => {
+        if (err) return rej(err);
+        res(m);
+      })
+    );
+
+    this._models = modelFiles.map<RailsFile>(filename => {
+      return new RailsFile(filename, '', []);
+    });
+
+    return this._models;
+  }
+
+  clearCache() {
+    this._knownFiles = {};
+    this._models = null;
+  }
 }
 
-interface _RailsWorkspaceCache {
-  [index: string]: RailsWorkspace;
-}
+class RailsWorkspaceCacher {
+  private _cache: { [index: string]: RailsWorkspace } = {};
+  private _disposers: vscode.Disposable[] = [];
 
-const cache: _RailsWorkspaceCache = {};
+  async fetch(workspacePath: string): Promise<RailsWorkspace> {
+    if (this._cache[workspacePath]) {
+      return this._cache[workspacePath];
+    }
+
+    const workspace = new RailsWorkspace(workspacePath);
+
+    const watchers = [
+      path.join(workspace.appPath, '**/*.rb'),
+      path.join(workspace.viewsPath, '**/*'),
+      path.join(workspace.specPath, '**/*.rb'),
+      path.join(workspace.testPath, '**/*.rb'),
+    ].map(glob => vscode.workspace.createFileSystemWatcher(glob, false, true));
+
+    watchers.forEach(watcher => {
+      watcher.onDidCreate(() => workspace.clearCache());
+      watcher.onDidDelete(() => workspace.clearCache());
+      this._disposers.push(watcher);
+    });
+
+    this._cache[workspacePath] = workspace;
+    return this._cache[workspacePath];
+  }
+
+  dispose() {
+    this._disposers.forEach(d => d.dispose());
+  }
+}
 
 /**
  * A cache of rails workspaces.
- * 
+ *
  * @example
- * 
+ *
  *   const workspace = await RailsWorkspaceCache.fetch('/path/to/workspace');
  */
-export const RailsWorkspaceCache = {
-  async fetch(path: string): Promise<RailsWorkspace> {
-    if (cache[path]) {
-      return cache[path];
-    }
-
-    cache[path] = new RailsWorkspace(path);
-    return cache[path];
-  },
-};
+export const RailsWorkspaceCache = new RailsWorkspaceCacher();
 
 /**
  * Given a rails file, return it's location in the app/* directory of the
  * workspace.
- * 
+ *
  * This is useful for deriving the location of related files. For example,
  * 'app/models/subdir/model.rb', will translate to 'subdir/model.rb', and if
  * we're looking for a spec that becomes 'spec/subdir/model_spec.rb'`
@@ -190,7 +232,7 @@ export function getSpecPath(
 /**
  * Get the view path of a controller
  */
-export function getViewPath(workspace:RailsWorkspace, railsFile: RailsFile) {
+export function getViewPath(workspace: RailsWorkspace, railsFile: RailsFile) {
   const justName = railsFile.basename
     .split('_')
     .slice(0, -1)

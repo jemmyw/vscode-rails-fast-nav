@@ -24,6 +24,44 @@ export async function modelMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
+  const models = await workspace.getModels();
+  const possibleModelNames = railsFile.possibleModelNames();
+  const modelToChecked = model => ({
+    filename: model.filename,
+    title: 'Model ' + model.basename,
+    type: 'model',
+    checkedExists: true,
+  });
+
+  if (railsFile.module.length > 0) {
+    return models
+      .filter(
+        model =>
+          model.module === railsFile.module &&
+          possibleModelNames.indexOf(model.possibleModelNames()[0]) >= 0
+      )
+      .map(modelToChecked);
+  }
+
+  return possibleModelNames
+    .reduce<RailsFile[]>((acc, possibleModelName) => {
+      const parts = possibleModelName.split('_');
+
+      for (let i = -1; Math.abs(i) <= parts.length; --i) {
+        const modulePart = parts.slice(0, i).join('_');
+        const modelPart = parts.slice(i).join('_');
+        const model = models.find(
+          model =>
+            model.module === modulePart &&
+            model.possibleModelNames()[0] === modelPart
+        );
+        if (model) acc.push(model);
+      }
+
+      return acc;
+    }, [])
+    .map(modelToChecked);
+
   const singularName = singularize(justName(railsFile));
   let location = path.join(
     workspace.modelsPath,

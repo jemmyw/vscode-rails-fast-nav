@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import * as vscode from 'vscode';
 import { getAllMethodNames, getLastMethodName } from './ruby-methods';
 import { classify } from 'inflected';
+import { singularize } from 'inflected';
 
 function isRailsRoot(filename: string): boolean {
   const railsBin = path.join(filename, 'bin', 'rails');
@@ -41,7 +42,7 @@ export class RailsFile {
   }
 
   get classname(): string {
-    return classify(path.basename(this._filename, this._parsed.ext));
+    return classify(this.withoutExt);
   }
 
   get filename(): string {
@@ -53,12 +54,38 @@ export class RailsFile {
   get basename(): string {
     return this._parsed.base;
   }
+  get withoutExt(): string {
+    return path.basename(this._filename, this._parsed.ext);
+  }
   get ext(): string {
     return this._parsed.ext;
   }
   get inApp(): boolean {
     return this._inApp;
   }
+  get module(): string {
+    const rel: string = path.relative(this._railsRoot, this._filename);
+    return rel
+      .split(path.sep)
+      .slice(2, this.isView() ? -2 : -1)
+      .join(path.sep);
+  }
+  possibleModelNames(): string[] {
+    if (this.isModel()) return [this.withoutExt];
+    if (this.isView()) return [singularize(path.basename(this.dirname))];
+    if (this.isFixture()) return [singularize(this.withoutExt)];
+
+    const parts = this.withoutExt.split('_');
+
+    if (this.isTest()) {
+      return [
+        singularize(parts.slice(0, -2).join('_')),
+        singularize(parts.slice(0, -3).join('_')),
+      ];
+    }
+    return [singularize(parts.slice(0, -1).join('_'))];
+  }
+
   get railsRoot(): string {
     return this._railsRoot;
   }
