@@ -9,16 +9,16 @@ export async function createView() {
     if (!railsFile.isController()) {
       return;
     }
-
+    const extension = vscode.workspace.getConfiguration('rails').get('viewFileExtension');
     const value =
       railsFile.methodName && railsFile.methodName.length > 0
-        ? `${railsFile.methodName}.html.erb`
+        ? `${railsFile.methodName}.${extension}`
         : '';
 
     const viewName = await vscode.window.showInputBox({
       value,
       prompt: `Create view for controller ${railsFile.classname}`,
-      placeHolder: 'index.html.erb',
+      placeHolder: `index.${extension}`,
     });
 
     if (!viewName || viewName === '') {

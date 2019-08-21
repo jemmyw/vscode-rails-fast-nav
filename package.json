@@ -32,8 +32,13 @@
       "properties": {
         "rails.appDir": {
           "type": "string",
-          "default": "",
+          "default": "app",
           "description": "Absolute or relative (to first workspace root) path to Rails app directory"
+        },
+        "rails.viewFileExtension": {
+          "type": "string",
+          "default": "html.erb",
+          "description": "Default extension when creating a view"
         }
       }
     },
