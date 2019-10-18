@@ -115,7 +115,7 @@
     "test-compile": "tsc -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "npm run test-compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
-    "copyTestProject": "cp -r src/test/project/* dist/test"
+    "copyTestProject": "cp -r src/test/project/* out/test"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
