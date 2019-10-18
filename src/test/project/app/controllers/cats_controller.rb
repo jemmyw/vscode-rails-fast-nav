@@ -10,4 +10,8 @@ class CatsController < ApplicationController
   def edit
     @cat = Cat.find(params[:id])
   end
+
+  def new
+    @cat = Cat.new
+  end
 end

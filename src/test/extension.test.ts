@@ -14,14 +14,25 @@ import * as path from 'path';
 
 let projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
-async function openFile(filename: string) {
+async function openFile(filename: string, line?: number) {
   await vscode.window.showTextDocument(
     await vscode.workspace.openTextDocument(path.join(projectPath, filename))
   );
+
+  if (line > 0) gotoLine(line);
 }
 
 function expectProjectFile(name: string) {
   expect(vscode.window.activeTextEditor.document.fileName, 'to end with', name);
+}
+
+function gotoLine(line: number): void {
+  vscode.window.activeTextEditor.selection = new vscode.Selection(
+    line + 1,
+    0,
+    line + 1,
+    0
+  );
 }
 
 suite('Extension Tests', function() {
@@ -66,8 +77,7 @@ suite('Extension Tests', function() {
   });
 
   test('switch to view', async () => {
-    await openFile('app/controllers/cats_controller.rb');
-    vscode.window.activeTextEditor.selection = new vscode.Selection(8, 0, 8, 0);
+    await openFile('app/controllers/cats_controller.rb', 7);
     await vscode.commands.executeCommand('rails.switchToView');
     expect(
       vscode.window.activeTextEditor.document.fileName,
@@ -77,19 +87,59 @@ suite('Extension Tests', function() {
   });
 
   test('switch to haml view', async () => {
-    await openFile('app/controllers/cats_controller.rb');
-    vscode.window.activeTextEditor.selection = new vscode.Selection(
-      12,
-      0,
-      12,
-      0
-    );
+    await openFile('app/controllers/cats_controller.rb', 11);
     await vscode.commands.executeCommand('rails.switchToView');
     expect(
       vscode.window.activeTextEditor.document.fileName,
       'to end with',
       'app/views/cats/edit.html.haml'
     );
+  });
+
+  suite('create view', () => {
+    const showInputBox = vscode.window.showInputBox;
+
+    test('with default extension', async () => {
+      try {
+        vscode.window.showInputBox = ({ value }) => {
+          return new Promise(r => r(value));
+        };
+
+        await openFile('app/controllers/cats_controller.rb', 15);
+        await vscode.commands.executeCommand('rails.createView');
+
+        expect(
+          vscode.window.activeTextEditor.document.fileName,
+          'to end with',
+          'app/views/cats/new.html.erb'
+        );
+      } finally {
+        vscode.window.showInputBox = showInputBox;
+      }
+    });
+
+    test('with custom extension', async () => {
+      const config = vscode.workspace.getConfiguration('rails');
+
+      try {
+        config.update('viewFileExtension', 'html.haml');
+        vscode.window.showInputBox = ({ value }) => {
+          return new Promise(r => r(value));
+        };
+
+        await openFile('app/controllers/cats_controller.rb', 15);
+        await vscode.commands.executeCommand('rails.createView');
+
+        expect(
+          vscode.window.activeTextEditor.document.fileName,
+          'to end with',
+          'app/views/cats/new.html.erb'
+        );
+      } finally {
+        vscode.window.showInputBox = showInputBox;
+        config.update('viewFileExtension', undefined);
+      }
+    });
   });
 
   test('switch to controller', async () => {
