@@ -65,14 +65,30 @@ suite('Extension Tests', function() {
     await vscode.commands.executeCommand('rails.switchToView');
   });
 
-  test.skip('switch to view', async () => {
+  test('switch to view', async () => {
     await openFile('app/controllers/cats_controller.rb');
-    await vscode.commands.executeCommand('workbench.action.gotoLine', 7);
+    vscode.window.activeTextEditor.selection = new vscode.Selection(8, 0, 8, 0);
     await vscode.commands.executeCommand('rails.switchToView');
     expect(
       vscode.window.activeTextEditor.document.fileName,
       'to end with',
       'app/views/cats/show.js.erb'
+    );
+  });
+
+  test('switch to haml view', async () => {
+    await openFile('app/controllers/cats_controller.rb');
+    vscode.window.activeTextEditor.selection = new vscode.Selection(
+      12,
+      0,
+      12,
+      0
+    );
+    await vscode.commands.executeCommand('rails.switchToView');
+    expect(
+      vscode.window.activeTextEditor.document.fileName,
+      'to end with',
+      'app/views/cats/edit.html.haml'
     );
   });
 

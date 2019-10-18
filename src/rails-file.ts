@@ -11,8 +11,9 @@ function isRailsRoot(filename: string): boolean {
   return fs.existsSync(railsBin) || fs.existsSync(railsScript);
 }
 
-function getRailsRoot(filename: string): string {
+function getRailsRoot(filename: string): string | null {
   const dir = path.dirname(filename);
+  if (dir === filename) return null;
 
   if (isRailsRoot(dir)) {
     return dir;
@@ -158,6 +159,8 @@ export function getCurrentRailsFile(): RailsFile | null {
 
   const activeSelection = editor.selection.active;
   const filename = editor.document.fileName;
+
+  if (!getRailsRoot(filename)) return null;
 
   return new RailsFile(
     filename,
