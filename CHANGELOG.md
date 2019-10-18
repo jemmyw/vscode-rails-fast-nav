@@ -1,3 +1,7 @@
+## 1.3.4
+
+- Bundled for size / performance
+
 ## 1.3.3
 
 - [aki77] Add viewFileExtension setting
