@@ -24,7 +24,7 @@
     "workspaceContains:**/bin/rails",
     "workspaceContains:**/script/rails"
   ],
-  "main": "./out/extension",
+  "main": "./dist/extension",
   "contributes": {
     "configuration": {
       "type": "object",
@@ -109,12 +109,13 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "webpack --mode production",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
+    "test-compile": "tsc -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
-    "copyTestProject": "cp -r src/test/project/* out/test"
+    "test": "npm run test-compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
+    "copyTestProject": "cp -r src/test/project/* dist/test"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
@@ -122,9 +123,12 @@
     "@types/inflected": "^1.1.29",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.11.1",
+    "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
     "unexpected": "^11.8.0",
-    "vscode": "^1.1.36"
+    "vscode": "^1.1.36",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
