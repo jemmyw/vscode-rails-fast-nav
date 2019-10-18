@@ -113,8 +113,7 @@
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",
     "test-compile": "tsc -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run test-compile && npm run copyTestProject && node ./node_modules/vscode/bin/test",
+    "test": "npm run webpack && npm run test-compile && npm run copyTestProject && node ./out/test/runTest.js",
     "copyTestProject": "cp -r src/test/project/* out/test"
   },
   "devDependencies": {
@@ -123,16 +122,18 @@
     "@types/inflected": "^1.1.29",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.11.1",
+    "@types/vscode": "^1.39.0",
+    "glob": "^7.1.4",
+    "mocha": "^6.2.1",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
     "unexpected": "^11.8.0",
-    "vscode": "^1.1.36",
+    "vscode-test": "^1.2.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
-    "glob": "^7.1.4",
     "inflected": "^2.0.2"
   }
 }
