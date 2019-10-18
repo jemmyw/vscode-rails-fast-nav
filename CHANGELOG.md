@@ -1,3 +1,7 @@
+## 1.3.3
+
+- [aki77] Add viewFileExtension setting
+
 ## 1.3.2
 
 - Detect when open file is outside the Rails root and show a warning
