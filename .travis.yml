@@ -12,7 +12,6 @@ before_install:
 
 install:
   - npm install
-  - npm run vscode:prepublish
 
 script:
   - npm test
@@ -20,4 +19,4 @@ script:
 language: node_js
 
 node_js:
-  - "12"
+  - "14"
