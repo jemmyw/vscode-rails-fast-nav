@@ -1,6 +1,5 @@
-# Rails Fast Nav ![Test Status](https://github.com/jemmyw/vscode-rails-fast-nav/actions/workflows/test.yml/badge.svg)
-
-
+# Rails Fast Nav ![Test status](https://img.shields.io/github/workflow/status/jemmyw/vscode-rails-fast-nav/Test.png)
+  
 Commands to move between files in a Rails application.
 
 ## Features
