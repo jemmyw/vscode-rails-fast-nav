@@ -1,182 +1,202 @@
-//
-// Note: This example test is leveraging the Mocha test framework.
-// Please refer to their documentation on https://mochajs.org/ for help.
-//
+import { expect } from "chai";
+import * as path from "path";
+import * as fs from "fs";
+import {
+  ActivityBar,
+  InputBox,
+  TextEditor,
+  Workbench,
+} from "vscode-extension-tester";
 
-// The module 'assert' provides assertion methods from node
-import * as expect from 'unexpected';
+const PROJECT_PATH = path.resolve("out/test");
+const packageJson: unknown = JSON.parse(
+  (fs.readFileSync(path.resolve("package.json")) as unknown) as string
+);
+const COMMANDS: { [index: string]: string } = packageJson["contributes"][
+  "commands"
+].reduce(
+  (acc, item) => ({
+    ...acc,
+    [item["command"]]: item["title"],
+  }),
+  {}
+);
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
-// import * as myExtension from '../extension';
-import * as path from 'path';
+describe("Extension Tests", function () {
+  this.timeout(60000);
 
-let projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+  let workbench: Workbench;
 
-async function openFile(filename: string, line?: number) {
-  await vscode.window.showTextDocument(
-    await vscode.workspace.openTextDocument(path.join(projectPath, filename))
-  );
+  async function openFile(filename: string, line?: number) {
+    await executeCommand("Extest: Open File");
+    const input = await InputBox.create();
+    await input.setText(path.join(PROJECT_PATH, filename));
+    await input.confirm();
 
-  if (line > 0) gotoLine(line);
-}
+    const editor = new TextEditor();
+    await editor.wait(1000);
 
-function expectProjectFile(name: string) {
-  expect(vscode.window.activeTextEditor.document.fileName, 'to end with', name);
-}
+    if (line > 0) await gotoLine(line);
 
-function gotoLine(line: number): void {
-  vscode.window.activeTextEditor.selection = new vscode.Selection(
-    line + 1,
-    0,
-    line + 1,
-    0
-  );
-}
+    return editor;
+  }
 
-suite('Extension Tests', function() {
-  setup(async () => {
-    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  async function executeCommand(command: string) {
+    await workbench.executeCommand(command);
+    await workbench.getDriver().sleep(100);
+  }
+
+  async function executeRawCommand(command: string) {
+    return await executeCommand(COMMANDS[command]);
+  }
+
+  async function expectProjectFile(name: string) {
+    const editor = new TextEditor();
+    expect((await editor.getFilePath()).endsWith(name)).to.be.true;
+  }
+
+  async function gotoLine(line: number): Promise<void> {
+    const editor = new TextEditor();
+    await editor.moveCursor(line, 1);
+  }
+
+  before(async () => {
+    workbench = new Workbench();
+    await executeCommand("Extest: Open Folder");
+    const input = await InputBox.create();
+    await input.setText(PROJECT_PATH + "/");
+    await input.confirm();
+
+    // to open a specific view and look it up
+    const control = await new ActivityBar().getViewControl("Explorer");
+    const explorer = await control.openView();
+    console.log(await explorer.getTitlePart().getTitle());
   });
 
-  test('commands are available', async () => {
-    await openFile('app/controllers/cats_controller.rb');
+  beforeEach(async () => {
+    await executeCommand("View: Close All Editors");
+  });
 
-    const commands = (await vscode.commands.getCommands()).filter(c =>
-      c.startsWith('rails.')
-    );
+  it("commands are available", async () => {
+    await openFile("app/controllers/cats_controller.rb");
+
+    await workbench.openCommandPrompt();
+    const input = await InputBox.create();
+    await input.setText("Rails:");
 
     for (let command of [
-      'fastNavigation',
-      'switchToView',
-      'switchToModel',
-      'switchToSpec',
-      'switchToTest',
-      'createView',
-      'createSpec',
+      "Rails: Fast Navigation",
+      "Rails: Switch to View",
+      "Rails: Switch to Controller",
+      "Rails: Switch to Model",
+      "Rails: Switch to Test",
+      "Rails: Switch to Spec",
+      "Rails: Switch to Fixture",
+      "Rails: Create View",
+      "Rails: Create Spec",
     ]) {
-      expect(commands, 'to have an item satisfying to be', `rails.${command}`);
+      const pick = await input.findQuickPick(command);
+      expect(pick, "to be present");
     }
   }).timeout(60000);
 
-  test('switch to model', async () => {
-    await openFile('app/controllers/cats_controller.rb');
-    await vscode.commands.executeCommand('rails.switchToModel');
-    expect(
-      vscode.window.activeTextEditor.document.fileName,
-      'to end with',
-      'app/models/cat.rb'
-    );
+  it("switch to model", async () => {
+    await openFile("app/controllers/cats_controller.rb");
+    await executeRawCommand("rails.switchToModel");
+    await expectProjectFile("app/models/cat.rb");
   });
 
-  // Mock quickPick
-  test.skip('switch to view, all actions', async () => {
-    await openFile('app/controllers/cats_controller.rb');
-    await vscode.commands.executeCommand('rails.switchToView');
+  it("shows all actions from the top of the controller", async () => {
+    await openFile("app/controllers/cats_controller.rb");
+    await executeRawCommand("rails.switchToView");
+    const input = await InputBox.create();
+    const picks = await input.getQuickPicks();
+    const strings = await Promise.all(picks.map((p) => p.getLabel()));
+
+    expect(strings).to.deep.equal([
+      "View edit.html.haml",
+      "View index.html.erb",
+      "View new.html.erb",
+      "View new.html.haml",
+      "View new.null",
+      "View show.js.erb",
+      "View hello",
+      "Partial _cat.html.erb",
+    ]);
   });
 
-  test('switch to view', async () => {
-    await openFile('app/controllers/cats_controller.rb', 7);
-    await vscode.commands.executeCommand('rails.switchToView');
-    expect(
-      vscode.window.activeTextEditor.document.fileName,
-      'to end with',
-      'app/views/cats/show.js.erb'
-    );
+  it("switch to view", async () => {
+    await openFile("app/controllers/cats_controller.rb", 7);
+    await expectProjectFile("app/controllers/cats_controller.rb");
+    await executeCommand("rails.switchToView");
+    await expectProjectFile("app/views/cats/show.js.erb");
   });
 
-  test('switch to haml view', async () => {
-    await openFile('app/controllers/cats_controller.rb', 11);
-    await vscode.commands.executeCommand('rails.switchToView');
-    expect(
-      vscode.window.activeTextEditor.document.fileName,
-      'to end with',
-      'app/views/cats/edit.html.haml'
-    );
+  it("switch to haml view", async () => {
+    await openFile("app/controllers/cats_controller.rb", 11);
+    await executeRawCommand("rails.switchToView");
+    await expectProjectFile("app/views/cats/edit.html.haml");
   });
 
-  suite('create view', () => {
-    const showInputBox = vscode.window.showInputBox;
+  describe("create view", () => {
+    it("with default extension", async () => {
+      await openFile("app/controllers/cats_controller.rb", 15);
+      await executeRawCommand("rails.createView");
 
-    test('with default extension', async () => {
-      try {
-        vscode.window.showInputBox = ({ value }) => {
-          return new Promise(r => r(value));
-        };
-
-        await openFile('app/controllers/cats_controller.rb', 15);
-        await vscode.commands.executeCommand('rails.createView');
-
-        expect(
-          vscode.window.activeTextEditor.document.fileName,
-          'to end with',
-          'app/views/cats/new.html.erb'
-        );
-      } finally {
-        vscode.window.showInputBox = showInputBox;
-      }
+      const input = await InputBox.create();
+      const text = await input.getText();
+      expect(text).to.equal("new.html.erb");
+      await input.confirm();
+      await expectProjectFile("app/views/cats/new.html.erb");
     });
 
-    test('with custom extension', async () => {
-      const config = vscode.workspace.getConfiguration('rails');
+    it("with custom extension", async () => {
+      const settings = await workbench.openSettings();
+      const setting = await settings.findSetting(
+        "View File Extension",
+        "Rails"
+      );
+      expect(setting).to.exist;
+      await setting.click();
+      await setting.setValue("html.haml");
 
-      try {
-        config.update('viewFileExtension', 'html.haml');
-        vscode.window.showInputBox = ({ value }) => {
-          return new Promise(r => r(value));
-        };
+      await openFile("app/controllers/cats_controller.rb", 15);
+      await executeRawCommand("rails.createView");
+      const input = await InputBox.create();
+      expect(await input.getText()).to.equal("new.html.haml");
+      await input.confirm();
 
-        await openFile('app/controllers/cats_controller.rb', 15);
-        await vscode.commands.executeCommand('rails.createView');
-
-        expect(
-          vscode.window.activeTextEditor.document.fileName,
-          'to end with',
-          'app/views/cats/new.html.erb'
-        );
-      } finally {
-        vscode.window.showInputBox = showInputBox;
-        config.update('viewFileExtension', undefined);
-      }
+      await expectProjectFile("app/views/cats/new.html.haml");
     });
   });
 
-  test('switch to controller', async () => {
-    await openFile('app/views/cats/_cat.html.erb');
-    await vscode.commands.executeCommand('rails.switchToController');
-    expectProjectFile('app/controllers/cats_controller.rb');
+  it("switch to controller", async () => {
+    await openFile("app/views/cats/_cat.html.erb");
+    await executeCommand("rails.switchToController");
+    await expectProjectFile("app/controllers/cats_controller.rb");
   });
 
-  test('switch to module fixture', async () => {
-    await openFile('app/models/big/lion.rb');
-    await vscode.commands.executeCommand('rails.switchToFixture');
-    expectProjectFile('spec/fixtures/big_lions.yml');
+  it("switch to module fixture", async () => {
+    await openFile("app/models/big/lion.rb");
+    await executeRawCommand("rails.switchToFixture");
+    await expectProjectFile("spec/fixtures/big_lions.yml");
   });
 
-  test('switch to module controller', async () => {
-    await openFile('app/views/big/lions/new.html.erb');
-    await vscode.commands.executeCommand('rails.switchToController');
-    expectProjectFile('app/controllers/big/lions_controller.rb');
+  it("switch to module controller", async () => {
+    await openFile("app/views/big/lions/new.html.erb");
+    await executeRawCommand("rails.switchToController");
+    await expectProjectFile("app/controllers/big/lions_controller.rb");
   });
 
-  test('switch to spec', async () => {
-    await openFile('app/models/cat.rb');
-    await vscode.commands.executeCommand('rails.switchToSpec');
-    expect(
-      vscode.window.activeTextEditor.document.fileName,
-      'to end with',
-      'spec/models/cat_spec.rb'
-    );
+  it("switch to spec", async () => {
+    await openFile("app/models/cat.rb");
+    await executeRawCommand("rails.switchToSpec");
+    await expectProjectFile("spec/models/cat_spec.rb");
   });
 
-  test('create spec', async () => {
-    await openFile('app/controllers/cats_controller.rb');
-    await vscode.commands.executeCommand('rails.createSpec');
-    expect(
-      vscode.window.activeTextEditor.document.fileName,
-      'to end with',
-      'spec/controllers/cats_controller_spec.rb'
-    );
+  it("create spec", async () => {
+    await openFile("app/controllers/cats_controller.rb");
+    await executeRawCommand("rails.createSpec");
+    await expectProjectFile("spec/controllers/cats_controller_spec.rb");
   });
 });
