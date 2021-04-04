@@ -8,5 +8,5 @@
     "rootDir": "src",
     "noUnusedLocals": true
   },
-  "exclude": ["node_modules", ".vscode-test", "dist"]
+  "exclude": ["node_modules", ".vscode-test", "dist", "test-resources"]
 }

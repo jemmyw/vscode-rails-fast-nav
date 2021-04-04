@@ -34,7 +34,7 @@ export async function viewMaker(
         return 1;
       }
       if (b.startsWith('_') && !a.startsWith('_')) {
-        return 1;
+        return -1;
       }
       const [aName, bName] = [a.split('.')[0], b.split('.')[0]];
       const [aMethod, bMethod] = [

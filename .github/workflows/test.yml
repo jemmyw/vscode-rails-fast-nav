@@ -1,0 +1,16 @@
+name: Test
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: '15.x'
+    - run: npm ci
+    - run: /usr/bin/xvfb-run --server-args="-screen 0 1920x1080x24" npm test
