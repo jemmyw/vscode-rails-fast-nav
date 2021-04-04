@@ -121,7 +121,6 @@ describe("Extension Tests", function () {
         "View edit.html.haml",
         "View index.html.erb",
         "View new.html.erb",
-        "View new.null",
         "View show.js.erb",
         "View hello",
         "Partial _cat.html.erb",
