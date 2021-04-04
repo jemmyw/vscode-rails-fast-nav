@@ -100,103 +100,111 @@ describe("Extension Tests", function () {
     }
   }).timeout(60000);
 
-  it("switch to model", async () => {
-    await openFile("app/controllers/cats_controller.rb");
-    await executeRawCommand("rails.switchToModel");
-    await expectProjectFile("app/models/cat.rb");
-  });
-
-  it("shows all actions from the top of the controller", async () => {
-    await openFile("app/controllers/cats_controller.rb");
-    await executeRawCommand("rails.switchToView");
-    const input = await InputBox.create();
-    const picks = await input.getQuickPicks();
-    const strings = await Promise.all(picks.map((p) => p.getLabel()));
-
-    expect(strings).to.deep.equal([
-      "View edit.html.haml",
-      "View index.html.erb",
-      "View new.html.erb",
-      "View new.html.haml",
-      "View new.null",
-      "View show.js.erb",
-      "View hello",
-      "Partial _cat.html.erb",
-    ]);
-  });
-
-  it("switch to view", async () => {
-    await openFile("app/controllers/cats_controller.rb", 7);
-    await expectProjectFile("app/controllers/cats_controller.rb");
-    await executeCommand("rails.switchToView");
-    await expectProjectFile("app/views/cats/show.js.erb");
-  });
-
-  it("switch to haml view", async () => {
-    await openFile("app/controllers/cats_controller.rb", 11);
-    await executeRawCommand("rails.switchToView");
-    await expectProjectFile("app/views/cats/edit.html.haml");
-  });
-
-  describe("create view", () => {
-    it("with default extension", async () => {
-      await openFile("app/controllers/cats_controller.rb", 15);
-      await executeRawCommand("rails.createView");
-
-      const input = await InputBox.create();
-      const text = await input.getText();
-      expect(text).to.equal("new.html.erb");
-      await input.confirm();
-      await expectProjectFile("app/views/cats/new.html.erb");
+  describe("from controller file", () => {
+    beforeEach(async () => {
+      await openFile("app/controllers/cats_controller.rb");
+      await expectProjectFile("app/controllers/cats_controller.rb");
     });
 
-    it("with custom extension", async () => {
-      const settings = await workbench.openSettings();
-      const setting = await settings.findSetting(
-        "View File Extension",
-        "Rails"
-      );
-      expect(setting).to.exist;
-      await setting.click();
-      await setting.setValue("html.haml");
+    it("switches to model", async () => {
+      await executeRawCommand("rails.switchToModel");
+      await expectProjectFile("app/models/cat.rb");
+    });
 
-      await openFile("app/controllers/cats_controller.rb", 15);
-      await executeRawCommand("rails.createView");
+    it("shows all actions from the top of the controller", async () => {
+      await executeRawCommand("rails.switchToView");
       const input = await InputBox.create();
-      expect(await input.getText()).to.equal("new.html.haml");
-      await input.confirm();
+      const picks = await input.getQuickPicks();
+      const strings = await Promise.all(picks.map((p) => p.getLabel()));
 
-      await expectProjectFile("app/views/cats/new.html.haml");
+      expect(strings).to.deep.equal([
+        "View edit.html.haml",
+        "View index.html.erb",
+        "View new.html.erb",
+        "View new.null",
+        "View show.js.erb",
+        "View hello",
+        "Partial _cat.html.erb",
+      ]);
+    });
+
+    it("switch to view", async () => {
+      await gotoLine(7);
+      await executeCommand("rails.switchToView");
+      await expectProjectFile("app/views/cats/show.js.erb");
+    });
+
+    it("switch to haml view", async () => {
+      await gotoLine(11);
+      await executeRawCommand("rails.switchToView");
+      await expectProjectFile("app/views/cats/edit.html.haml");
+    });
+
+    describe("create view", () => {
+      it("with default extension", async () => {
+        await gotoLine(15);
+        await executeRawCommand("rails.createView");
+
+        const input = await InputBox.create();
+        const text = await input.getText();
+        expect(text).to.equal("new.html.erb");
+        await input.confirm();
+        await expectProjectFile("app/views/cats/new.html.erb");
+      });
+
+      it("with custom extension", async () => {
+        const settings = await workbench.openSettings();
+        const setting = await settings.findSetting(
+          "View File Extension",
+          "Rails"
+        );
+        expect(setting).to.exist;
+        await setting.click();
+        await setting.setValue("html.haml");
+        await workbench.executeCommand("View: Close Editor");
+
+        await openFile("app/controllers/cats_controller.rb", 15);
+        await executeRawCommand("rails.createView");
+        const input = await InputBox.create();
+        expect(await input.getText()).to.equal("new.html.haml");
+        await input.confirm();
+
+        await expectProjectFile("app/views/cats/new.html.haml");
+      });
+    });
+
+    it("create spec", async () => {
+      await openFile("app/controllers/cats_controller.rb");
+      await executeRawCommand("rails.createSpec");
+      await expectProjectFile("spec/controllers/cats_controller_spec.rb");
     });
   });
 
-  it("switch to controller", async () => {
-    await openFile("app/views/cats/_cat.html.erb");
-    await executeCommand("rails.switchToController");
-    await expectProjectFile("app/controllers/cats_controller.rb");
+  describe("from view file", () => {
+    it("switch to controller", async () => {
+      await openFile("app/views/cats/_cat.html.erb");
+      await executeCommand("rails.switchToController");
+      await expectProjectFile("app/controllers/cats_controller.rb");
+    });
+
+    it("switch to module controller", async () => {
+      await openFile("app/views/big/lions/new.html.erb");
+      await executeRawCommand("rails.switchToController");
+      await expectProjectFile("app/controllers/big/lions_controller.rb");
+    });
   });
 
-  it("switch to module fixture", async () => {
-    await openFile("app/models/big/lion.rb");
-    await executeRawCommand("rails.switchToFixture");
-    await expectProjectFile("spec/fixtures/big_lions.yml");
-  });
+  describe("from model file", () => {
+    it("switch to module fixture", async () => {
+      await openFile("app/models/big/lion.rb");
+      await executeRawCommand("rails.switchToFixture");
+      await expectProjectFile("spec/fixtures/big_lions.yml");
+    });
 
-  it("switch to module controller", async () => {
-    await openFile("app/views/big/lions/new.html.erb");
-    await executeRawCommand("rails.switchToController");
-    await expectProjectFile("app/controllers/big/lions_controller.rb");
-  });
-
-  it("switch to spec", async () => {
-    await openFile("app/models/cat.rb");
-    await executeRawCommand("rails.switchToSpec");
-    await expectProjectFile("spec/models/cat_spec.rb");
-  });
-
-  it("create spec", async () => {
-    await openFile("app/controllers/cats_controller.rb");
-    await executeRawCommand("rails.createSpec");
-    await expectProjectFile("spec/controllers/cats_controller_spec.rb");
+    it("switch to spec", async () => {
+      await openFile("app/models/cat.rb");
+      await executeRawCommand("rails.switchToSpec");
+      await expectProjectFile("spec/models/cat_spec.rb");
+    });
   });
 });
