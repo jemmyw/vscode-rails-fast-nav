@@ -13,6 +13,4 @@ jobs:
       with:
         node-version: '15.x'
     - run: npm ci
-    - run: |
-        export DISPLAY=:99
-        npm test
+    - run: /usr/bin/xvfb-run --server-args="-screen 0 1920x1080x24" npm test
