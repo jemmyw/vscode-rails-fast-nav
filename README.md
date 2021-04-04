@@ -1,4 +1,5 @@
-# Rails Fast Nav [![Build Status](https://travis-ci.org/jemmyw/vscode-rails-fast-nav.svg?branch=master)](https://travis-ci.org/jemmyw/vscode-rails-fast-nav)
+# Rails Fast Nav ![Test Status](https://github.com/jemmyw/vscode-rails-fast-nav/actions/workflows/test.yml/badge.svg)
+
 
 Commands to move between files in a Rails application.
 
