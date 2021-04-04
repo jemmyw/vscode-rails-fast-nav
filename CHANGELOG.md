@@ -1,3 +1,7 @@
+## 1.3.6
+
+- Updated README
+
 ## 1.3.5
 
 - Fix sort order in view switcher so that partials are last
