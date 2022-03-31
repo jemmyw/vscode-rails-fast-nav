@@ -17,7 +17,6 @@ export async function fixtureMaker(
   return railsFile.possibleModelNames().map(modelName => {
     const basename =
       railsFile.module.replace(path.sep, '_') +
-      '_' +
       pluralize(modelName) +
       '.yml';
 
