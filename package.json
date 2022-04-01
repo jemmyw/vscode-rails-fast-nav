@@ -72,6 +72,10 @@
         "title": "Rails: Switch to Fixture"
       },
       {
+        "command": "rails.switchToModelTest",
+        "title": "Rails: Switch to Model Test"
+      },
+      {
         "command": "rails.createView",
         "title": "Rails: Create View"
       },
@@ -104,6 +108,11 @@
       {
         "command": "rails.switchToTest",
         "key": "alt+y",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToModelTest",
+        "key": "alt+a",
         "when": "editorTextFocus"
       }
     ]

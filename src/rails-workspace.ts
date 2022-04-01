@@ -30,6 +30,10 @@ export class RailsWorkspace {
     return path.join(this.path, 'spec');
   }
 
+  get modelTestPath(): string {
+    return path.join(this.path, 'test')
+  }
+
   get testPath(): string {
     return path.join(this.path, 'test');
   }
@@ -52,6 +56,10 @@ export class RailsWorkspace {
 
   async hasTests(): Promise<boolean> {
     return this.hasFile(this.testPath);
+  }
+
+  async hasModelTest(): Promise<boolean> {
+    return this.hasFile(this.modelTestPath);
   }
 
   async hasFile(path: string): Promise<boolean> {
@@ -199,6 +207,27 @@ export async function getTestFile(
   const specs = await workspace.hasSpecs();
   const fn = specs ? getSpecPath : getTestPath;
   return fn(railsFile, workspace);
+}
+
+export async function getModelTestFile(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): Promise<string> {
+  return getModelTestPath(railsFile,  workspace);
+}
+
+export function getModelTestPath(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
+    workspace
+  );
+
+  return path.join(
+    workspace.modelTestPath,
+    appendWithoutExt(relFn(railsFile.filename), '_test')
+  );
 }
 
 export function getTestPath(
