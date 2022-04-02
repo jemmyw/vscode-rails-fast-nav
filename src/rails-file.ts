@@ -149,6 +149,9 @@ export class RailsFile {
   isModelTest() {
     return this.fileType === 'modelTest'
   }
+  isGrapeApi() {
+    return this.isInAppDir('grapeApi');
+  }
 }
 
 /**

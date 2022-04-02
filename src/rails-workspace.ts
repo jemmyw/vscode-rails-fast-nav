@@ -34,6 +34,11 @@ export class RailsWorkspace {
     return path.join(this.path, 'test')
   }
 
+  get grapeApiPath(): string {
+    const grapeDir = vscode.workspace.getConfiguration('rails').get('grapeDir')
+    return path.join(this.appPath, `${grapeDir}`, 'api')
+  }
+
   get testPath(): string {
     return path.join(this.path, 'test');
   }

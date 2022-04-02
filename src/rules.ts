@@ -10,6 +10,7 @@ import {
   inverseTestMaker,
   fixtureMaker,
   modelTestMaker,
+  grapeApiMaker,
 } from './makers';
 
 function switchRule(matcher: SwitchMatcher, maker: SwitchMaker): SwitchRule {
@@ -35,5 +36,6 @@ export const rules = [
   switchRule(f => f.isController(), viewMaker),
   switchRule(f => f.isModel() || f.isView(), controllerMaker),
   switchRule(f => !f.isFixture(), fixtureMaker),
-  switchRule(f => !f.isModelTest(), modelTestMaker)
+  switchRule(f => !f.isModelTest(), modelTestMaker),
+  switchRule(f => !f.isGrapeApi(), grapeApiMaker)
 ];

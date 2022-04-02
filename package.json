@@ -39,6 +39,11 @@
           "type": "string",
           "default": "html.erb",
           "description": "Default extension when creating a view"
+        },
+        "rails.grapeDir": {
+          "type": "string",
+          "default": "grape",
+          "description": "Absolute or relative path to Grape directory"
         }
       }
     },
@@ -74,6 +79,10 @@
       {
         "command": "rails.switchToModelTest",
         "title": "Rails: Switch to Model Test"
+      },
+      {
+        "command": "rails.switchToGrapeApi",
+        "title": "Rails: Switch to Grape Api"
       },
       {
         "command": "rails.createView",
