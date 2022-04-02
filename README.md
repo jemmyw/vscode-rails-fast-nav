@@ -6,6 +6,7 @@ Commands to move between files in a Rails application.
 
 - Navigate to all known files (alt+r) [command.railsFastNavigation]
 - Switch to model [command.railsFastSwitchToModel]
+- Switch to model test [command.railsSwitchToModelTest]
 - Switch to controller [command.railsSwitchToController]
 - Switch to view [command.railsFastSwitchToView]
 - Switch to test/spec [command.railsFastSwitchToTest] + alias [command.railsFastSwitchToSpec]
