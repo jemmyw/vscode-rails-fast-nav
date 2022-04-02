@@ -34,6 +34,10 @@ export class RailsWorkspace {
     return path.join(this.path, 'test')
   }
 
+  get controllerTestPath(): string {
+    return path.join(this.path, 'test')
+  }
+
   get testPath(): string {
     return path.join(this.path, 'test');
   }
@@ -255,6 +259,27 @@ export function getSpecPath(
   return path.join(
     workspace.specPath,
     appendWithoutExt(relFn(railsFile.filename), '_spec')
+  );
+}
+
+export async function getControllerTestFile(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): Promise<string> {
+  return getModelTestPath(railsFile,  workspace);
+}
+
+export function getControllerTestPath(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
+    workspace
+  );
+
+  return path.join(
+    workspace.controllerTestPath,
+    appendWithoutExt(relFn(railsFile.filename), '_test')
   );
 }
 

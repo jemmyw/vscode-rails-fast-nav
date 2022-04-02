@@ -1,0 +1,2 @@
+class CatsControllerTest
+end

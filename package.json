@@ -56,6 +56,10 @@
         "title": "Rails: Switch to Controller"
       },
       {
+        "command": "rails.switchToControllerTest",
+        "title": "Rails: Switch to Controller Test"
+      },
+      {
         "command": "rails.switchToModel",
         "title": "Rails: Switch to Model"
       },
@@ -98,6 +102,11 @@
       {
         "command": "rails.switchToController",
         "key": "alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rails.switchToControllerTest",
+        "key": "alt+a",
         "when": "editorTextFocus"
       },
       {

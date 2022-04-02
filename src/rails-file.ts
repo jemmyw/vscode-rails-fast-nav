@@ -149,6 +149,9 @@ export class RailsFile {
   isModelTest() {
     return this.fileType === 'modelTest'
   }
+  isControllerTest() {
+    return this.fileType === 'controllerTest'
+  }
 }
 
 /**
