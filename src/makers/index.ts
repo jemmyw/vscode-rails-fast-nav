@@ -5,3 +5,4 @@ export * from './test-maker';
 export * from './inverse-test-maker';
 export * from './controller-maker';
 export * from './fixture-maker';
+export * from './model-test-maker';

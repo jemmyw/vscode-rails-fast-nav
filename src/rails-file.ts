@@ -146,6 +146,9 @@ export class RailsFile {
   isFixture() {
     return this.fileType === 'fixture';
   }
+  isModelTest() {
+    return this.fileType === 'modelTest'
+  }
 }
 
 /**
