@@ -128,7 +128,7 @@
     "@types/vscode": "^1.39.0",
     "chai": "^4.3.4",
     "glob": "^7.1.4",
-    "mocha": "^6.2.1",
+    "mocha": "^10.2.0",
     "rimraf": "^2.7.1",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
