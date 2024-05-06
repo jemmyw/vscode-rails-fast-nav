@@ -210,8 +210,8 @@ export function getTestPath(
   );
 
   return path.join(
-    workspace.specPath,
-    appendWithoutExt(relFn(railsFile.filename), '_spec')
+    workspace.testPath,
+    appendWithoutExt(relFn(railsFile.filename), '_test')
   );
 }
 
