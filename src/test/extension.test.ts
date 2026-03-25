@@ -191,6 +191,12 @@ describe("Extension Tests", function () {
       await executeRawCommand("rails.switchToController");
       await expectProjectFile("app/controllers/big/lions_controller.rb");
     });
+
+    it("switch to non-resource controller (dashboard)", async () => {
+      await openFile("app/views/dashboard/index.html.erb");
+      await executeRawCommand("rails.switchToController");
+      await expectProjectFile("app/controllers/dashboard_controller.rb");
+    });
   });
 
   describe("from model file", () => {
