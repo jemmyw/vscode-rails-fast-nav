@@ -8,12 +8,14 @@ export async function controllerMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
+  const appRoot = railsFile.containingAppPath || workspace.appPath;
+  const controllersPath = path.join(appRoot, 'controllers');
   return railsFile.possibleModelNames().map(possibleModelName => {
     const controllerName = pluralize(possibleModelName) + '_controller.rb';
     return {
       checkedExists: false,
       filename: path.join(
-        workspace.controllersPath,
+        controllersPath,
         railsFile.module,
         controllerName
       ),

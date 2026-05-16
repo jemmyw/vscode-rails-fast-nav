@@ -1,8 +1,6 @@
 import { SwitchFile } from '../types';
 import { RailsFile } from '../rails-file';
-import { RailsWorkspace, relativeToAppDir } from '../rails-workspace';
-import { appendWithoutExt } from '../path-utils';
-import * as path from 'path';
+import { RailsWorkspace, getSpecPath } from '../rails-workspace';
 
 export function specMaker(
   railsFile: RailsFile,
@@ -10,10 +8,7 @@ export function specMaker(
 ): SwitchFile[] {
   return [
     {
-      filename: path.join(
-        workspace.specPath,
-        appendWithoutExt(relativeToAppDir(workspace, railsFile.filename), '_spec')
-      ),
+      filename: getSpecPath(railsFile, workspace),
       title: 'Spec file',
       type: 'spec',
     },

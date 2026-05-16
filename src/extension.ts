@@ -5,6 +5,14 @@ import { commands } from './commands';
 import { RailsWorkspaceCache } from './rails-workspace';
 
 export function activate(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(e => {
+      if (e.affectsConfiguration('rails')) {
+        RailsWorkspaceCache.invalidateAllWorkspaces();
+      }
+    })
+  );
+
   Object.keys(commands).forEach(name => {
     const command = commands[name];
     const disposable = vscode.commands.registerCommand(
