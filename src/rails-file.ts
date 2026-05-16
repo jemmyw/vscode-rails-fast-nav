@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { getAllMethodNames, getLastMethodName } from './ruby-methods';
 import { classify } from 'inflected';
 import { singularize } from 'inflected';
+import { expandRailsAppRoots, findContainingAppRoot } from './rails-app-roots';
 
 function isRailsRoot(filename: string): boolean {
   const railsBin = path.join(filename, 'bin', 'rails');
@@ -27,8 +28,9 @@ function getRailsRoot(filename: string): string | null {
  */
 export class RailsFile {
   private _parsed: path.ParsedPath;
-  private _railsRoot: string;
+  private _railsRoot: string | null;
   private _inApp: boolean;
+  private _containingAppPath: string | null;
 
   constructor(
     private _filename: string,
@@ -37,9 +39,16 @@ export class RailsFile {
   ) {
     this._parsed = path.parse(this._filename);
     this._railsRoot = getRailsRoot(this._parsed.dir);
-    this._inApp = path
-      .relative(this._railsRoot, _filename)
-      .startsWith('app' + path.sep);
+    if (this._railsRoot) {
+      const expanded = expandRailsAppRoots(this._railsRoot);
+      this._containingAppPath = findContainingAppRoot(_filename, expanded);
+    } else {
+      this._containingAppPath = null;
+    }
+    this._inApp =
+      this._containingAppPath !== null &&
+      (_filename === this._containingAppPath ||
+        _filename.startsWith(this._containingAppPath + path.sep));
   }
 
   get classname(): string {
@@ -64,7 +73,23 @@ export class RailsFile {
   get inApp(): boolean {
     return this._inApp;
   }
+
+  /** Nearest configured `.../app` directory containing this file, if any. */
+  get containingAppPath(): string | null {
+    return this._containingAppPath;
+  }
+
   get module(): string {
+    if (!this._railsRoot) {
+      return '';
+    }
+
+    if (this._inApp && this._containingAppPath) {
+      const rel = path.relative(this._containingAppPath, this._filename);
+      const parts = rel.split(path.sep);
+      return parts.slice(1, this.isView() ? -2 : -1).join(path.sep);
+    }
+
     const rel: string = path.relative(this._railsRoot, this._filename);
     return rel
       .split(path.sep)
@@ -88,7 +113,7 @@ export class RailsFile {
   }
 
   get railsRoot(): string {
-    return this._railsRoot;
+    return this._railsRoot!;
   }
 
   get fileType(): string {
@@ -114,11 +139,12 @@ export class RailsFile {
       return 'unknown';
     }
 
-    const rel: string = path.relative(
-      path.join(this._railsRoot, 'app'),
-      this._filename
-    );
-    return rel.split(path.sep)[0];
+    if (this._containingAppPath) {
+      const rel: string = path.relative(this._containingAppPath, this._filename);
+      return rel.split(path.sep)[0];
+    }
+
+    return 'unknown';
   }
 
   get methodName(): string {
