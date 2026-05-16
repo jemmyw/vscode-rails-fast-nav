@@ -206,4 +206,44 @@ describe("Extension Tests", function () {
       await expectProjectFile("spec/models/cat_spec.rb");
     });
   });
+
+  describe("Packwerk-style package (rails.appDirs)", () => {
+    it("switch to view from package controller", async () => {
+      await openFile(
+        "packs/billing/app/controllers/billing/invoices_controller.rb"
+      );
+      await gotoLine(3);
+      await executeRawCommand("rails.switchToView");
+      await expectProjectFile(
+        "packs/billing/app/views/billing/invoices/show.html.erb"
+      );
+    });
+
+    it("switch to model from package controller", async () => {
+      await openFile(
+        "packs/billing/app/controllers/billing/invoices_controller.rb"
+      );
+      await executeRawCommand("rails.switchToModel");
+      await expectProjectFile("packs/billing/app/models/billing/invoice.rb");
+    });
+
+    it("switch to spec from package model", async () => {
+      await openFile("packs/billing/app/models/billing/invoice.rb");
+      await executeRawCommand("rails.switchToSpec");
+      await expectProjectFile("packs/billing/spec/models/billing/invoice_spec.rb");
+    });
+  });
+
+  describe("Rails engine (rails.appDirs)", () => {
+    it("switch to view from engine controller", async () => {
+      await openFile(
+        "engines/documents/app/controllers/documents/documents_controller.rb"
+      );
+      await gotoLine(3);
+      await executeRawCommand("rails.switchToView");
+      await expectProjectFile(
+        "engines/documents/app/views/documents/documents/index.html.erb"
+      );
+    });
+  });
 });
