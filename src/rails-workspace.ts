@@ -4,6 +4,11 @@ import * as vscode from 'vscode';
 import * as glob from 'glob';
 import { RailsFile } from './rails-file';
 import { appendWithoutExt } from './path-utils';
+import {
+  expandRailsAppRoots,
+  clearRailsAppRootsCacheFor,
+  clearRailsAppRootsCache,
+} from './rails-app-roots';
 
 /**
  * Some information about a Rails application at a given path.
@@ -13,7 +18,7 @@ import { appendWithoutExt } from './path-utils';
  */
 export class RailsWorkspace {
   private _knownFiles: { [index: string]: boolean } = {};
-  private _models: RailsFile[] = null;
+  private _models: RailsFile[] | null = null;
 
   constructor(private _path: string) {}
 
@@ -21,7 +26,12 @@ export class RailsWorkspace {
     return this._path;
   }
 
+  /** Primary app directory (top-level app preferred when present). */
   get appPath(): string {
+    const roots = this.getExpandedAppRoots();
+    if (roots.length > 0) {
+      return roots[0];
+    }
     const appDir = vscode.workspace.getConfiguration('rails').get('appDir', 'app');
     return path.resolve(this.path, appDir);
   }
@@ -32,6 +42,46 @@ export class RailsWorkspace {
 
   get testPath(): string {
     return path.join(this.path, 'test');
+  }
+
+  getExpandedAppRoots(): string[] {
+    return expandRailsAppRoots(this.path);
+  }
+
+  getCandidateSpecRoots(): string[] {
+    const roots: string[] = [];
+    const top = path.join(this.path, 'spec');
+    if (fs.existsSync(top)) {
+      roots.push(path.normalize(top));
+    }
+    for (const appRoot of this.getExpandedAppRoots()) {
+      const local = path.join(path.dirname(appRoot), 'spec');
+      if (fs.existsSync(local)) {
+        const n = path.normalize(local);
+        if (roots.indexOf(n) < 0) {
+          roots.push(n);
+        }
+      }
+    }
+    return roots;
+  }
+
+  getCandidateTestRoots(): string[] {
+    const roots: string[] = [];
+    const top = path.join(this.path, 'test');
+    if (fs.existsSync(top)) {
+      roots.push(path.normalize(top));
+    }
+    for (const appRoot of this.getExpandedAppRoots()) {
+      const local = path.join(path.dirname(appRoot), 'test');
+      if (fs.existsSync(local)) {
+        const n = path.normalize(local);
+        if (roots.indexOf(n) < 0) {
+          roots.push(n);
+        }
+      }
+    }
+    return roots;
   }
 
   get controllersPath(): string {
@@ -47,24 +97,24 @@ export class RailsWorkspace {
   }
 
   async hasSpecs(): Promise<boolean> {
-    return this.hasFile(this.specPath);
+    return Promise.resolve(this.getCandidateSpecRoots().length > 0);
   }
 
   async hasTests(): Promise<boolean> {
-    return this.hasFile(this.testPath);
+    return Promise.resolve(this.getCandidateTestRoots().length > 0);
   }
 
-  async hasFile(path: string): Promise<boolean> {
-    if (this._knownFiles[path]) {
+  async hasFile(pathToCheck: string): Promise<boolean> {
+    if (this._knownFiles[pathToCheck]) {
       return true;
     }
-    if (!path.startsWith(this.path)) {
+    if (!pathToCheck.startsWith(this.path)) {
       return false;
     }
 
-    const exists = await fs.pathExists(path);
+    const exists = await fs.pathExists(pathToCheck);
     if (exists) {
-      this._knownFiles[path] = true;
+      this._knownFiles[pathToCheck] = true;
     }
 
     return exists;
@@ -77,12 +127,27 @@ export class RailsWorkspace {
   async getModels() {
     if (this._models) return this._models;
 
-    const modelFiles = await new Promise<string[]>((res, rej) =>
-      glob(this.modelsPath + '/**/*.rb', (err, m) => {
-        if (err) return rej(err);
-        res(m);
-      })
-    );
+    const seen = new Set<string>();
+    const modelFiles: string[] = [];
+    for (const appRoot of this.getExpandedAppRoots()) {
+      const modelsDir = path.join(appRoot, 'models');
+      if (!fs.existsSync(modelsDir)) {
+        continue;
+      }
+      const found = await new Promise<string[]>((res, rej) =>
+        glob(modelsDir + '/**/*.rb', (err, m) => {
+          if (err) return rej(err);
+          res(m);
+        })
+      );
+      for (const f of found) {
+        const n = path.normalize(f);
+        if (!seen.has(n)) {
+          seen.add(n);
+          modelFiles.push(f);
+        }
+      }
+    }
 
     this._models = modelFiles.map<RailsFile>(filename => {
       return new RailsFile(filename, '', []);
@@ -91,15 +156,25 @@ export class RailsWorkspace {
     return this._models;
   }
 
-  clearCache() {
+  clearContentCache(): void {
     this._knownFiles = {};
     this._models = null;
+  }
+
+  clearCache() {
+    this.clearContentCache();
+    clearRailsAppRootsCacheFor(this.path);
   }
 }
 
 class RailsWorkspaceCacher {
   private _cache: { [index: string]: RailsWorkspace } = {};
   private _disposers: vscode.Disposable[] = [];
+
+  invalidateAllWorkspaces(): void {
+    clearRailsAppRootsCache();
+    Object.keys(this._cache).forEach(k => this._cache[k].clearContentCache());
+  }
 
   async fetch(workspacePath: string): Promise<RailsWorkspace> {
     if (this._cache[workspacePath]) {
@@ -108,12 +183,21 @@ class RailsWorkspaceCacher {
 
     const workspace = new RailsWorkspace(workspacePath);
 
-    const watchers = [
-      path.join(workspace.appPath, '**/*.rb'),
-      path.join(workspace.viewsPath, '**/*'),
-      path.join(workspace.specPath, '**/*.rb'),
-      path.join(workspace.testPath, '**/*.rb'),
-    ].map(glob => vscode.workspace.createFileSystemWatcher(glob, false, true));
+    const watchGlobs: string[] = [];
+    for (const appRoot of workspace.getExpandedAppRoots()) {
+      watchGlobs.push(path.join(appRoot, '**/*.rb'));
+      watchGlobs.push(path.join(appRoot, 'views', '**/*'));
+    }
+    for (const specRoot of workspace.getCandidateSpecRoots()) {
+      watchGlobs.push(path.join(specRoot, '**/*.rb'));
+    }
+    for (const testRoot of workspace.getCandidateTestRoots()) {
+      watchGlobs.push(path.join(testRoot, '**/*.rb'));
+    }
+
+    const watchers = watchGlobs.map(g =>
+      vscode.workspace.createFileSystemWatcher(g, false, true)
+    );
 
     watchers.forEach(watcher => {
       watcher.onDidCreate(() => workspace.clearCache());
@@ -139,6 +223,32 @@ class RailsWorkspaceCacher {
  */
 export const RailsWorkspaceCache = new RailsWorkspaceCacher();
 
+export function getEffectiveSpecRoot(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  if (railsFile.containingAppPath) {
+    const local = path.join(path.dirname(railsFile.containingAppPath), 'spec');
+    if (fs.existsSync(local)) {
+      return local;
+    }
+  }
+  return path.join(workspace.path, 'spec');
+}
+
+export function getEffectiveTestRoot(
+  railsFile: RailsFile,
+  workspace: RailsWorkspace
+): string {
+  if (railsFile.containingAppPath) {
+    const local = path.join(path.dirname(railsFile.containingAppPath), 'test');
+    if (fs.existsSync(local)) {
+      return local;
+    }
+  }
+  return path.join(workspace.path, 'test');
+}
+
 /**
  * Given a rails file, return it's location in the app/* directory of the
  * workspace.
@@ -149,10 +259,12 @@ export const RailsWorkspaceCache = new RailsWorkspaceCacher();
  */
 export function locationWithinAppLocation(
   filename: string,
-  workspace: RailsWorkspace
+  workspace: RailsWorkspace,
+  appRoot?: string
 ): string {
+  const base = appRoot || workspace.appPath;
   return path
-    .dirname(relativeToAppDir(workspace, filename))
+    .dirname(path.relative(base, filename))
     .split(path.sep)
     .slice(1)
     .join(path.sep);
@@ -170,7 +282,7 @@ export function relativeToRootDir(
   filename?: string
 ) {
   if (!filename) {
-    return filename => relativeToRootDir(workspace, filename);
+    return (fn: string) => relativeToRootDir(workspace, fn);
   }
   return path.relative(workspace.path, filename);
 }
@@ -187,7 +299,7 @@ export function relativeToAppDir(
 ): string;
 export function relativeToAppDir(workspace: RailsWorkspace, filename?: string) {
   if (!filename) {
-    return filename => relativeToAppDir(workspace, filename);
+    return (fn: string) => relativeToAppDir(workspace, fn);
   }
   return path.relative(workspace.appPath, filename);
 }
@@ -205,12 +317,14 @@ export function getTestPath(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): string {
-  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
-    workspace
-  );
+  const testRoot = getEffectiveTestRoot(railsFile, workspace);
+  const appBase = railsFile.containingAppPath || workspace.appPath;
+  const relFn = railsFile.inApp
+    ? (fn: string) => path.relative(appBase, fn)
+    : relativeToRootDir(workspace);
 
   return path.join(
-    workspace.testPath,
+    testRoot,
     appendWithoutExt(relFn(railsFile.filename), '_test')
   );
 }
@@ -219,12 +333,14 @@ export function getSpecPath(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): string {
-  const relFn = (railsFile.inApp ? relativeToAppDir : relativeToRootDir)(
-    workspace
-  );
+  const specRoot = getEffectiveSpecRoot(railsFile, workspace);
+  const appBase = railsFile.containingAppPath || workspace.appPath;
+  const relFn = railsFile.inApp
+    ? (fn: string) => path.relative(appBase, fn)
+    : relativeToRootDir(workspace);
 
   return path.join(
-    workspace.specPath,
+    specRoot,
     appendWithoutExt(relFn(railsFile.filename), '_spec')
   );
 }
@@ -237,9 +353,11 @@ export function getViewPath(workspace: RailsWorkspace, railsFile: RailsFile) {
     .split('_')
     .slice(0, -1)
     .join('_');
+  const appRoot = railsFile.containingAppPath || workspace.appPath;
+  const viewsPath = path.join(appRoot, 'views');
   return path.join(
-    workspace.viewsPath,
-    locationWithinAppLocation(railsFile.filename, workspace),
+    viewsPath,
+    locationWithinAppLocation(railsFile.filename, workspace, appRoot),
     justName
   );
 }
