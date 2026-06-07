@@ -24,7 +24,7 @@ Routing: a navigation feature usually touches a maker + `rules.ts` + the relevan
 - `npm run test-compile` — tsc; run before claiming done.
 - `npm run test:unit` — fast headless unit tests (mocha).
 - `npm test` — full vscode-extension-tester suite; needs a GUI VS Code instance and will not run in an agent/headless env. Add integration tests but ask the user to run this locally/CI.
-- Keep `vscode-extension-tester` on 8.x+. Old 4.x only fetched Intel `mac64` VS Code and chromedriver from the retired Google bucket, which breaks on Apple Silicon and Chrome >= 115. 8.x pulls `darwin-universal` VS Code + Chrome-for-Testing chromedriver. `skipLibCheck` is on because extest's selenium/ws type deps need newer lib globals. Open files/folders in tests with `VSBrowser.instance.openResources(...)`; the old `Extest: Open File/Folder` palette commands were removed.
+- Keep `vscode-extension-tester` on 8.x+. Old 4.x only fetched Intel `mac64` VS Code and chromedriver from the retired Google bucket, which breaks on Apple Silicon and Chrome >= 115. 8.x pulls `darwin-universal` VS Code + Chrome-for-Testing chromedriver. `skipLibCheck` is on because extest's selenium/ws type deps need newer lib globals. Open files/folders in tests with `VSBrowser.instance.openResources(...)`; the old `Extest: Open File/Folder` palette commands were removed. Set config in tests by writing the workspace `.vscode/settings.json` (then wait briefly), not by driving the Settings UI, which breaks across VS Code versions. Tests that open a quick pick only to read it must `input.cancel()` afterward or the next palette interaction fails.
 
 ## Release flow
 

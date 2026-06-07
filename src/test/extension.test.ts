@@ -152,23 +152,29 @@ describe("Extension Tests", function () {
       });
 
       it("with custom extension", async () => {
-        const settings = await workbench.openSettings();
-        const setting = await settings.findSetting(
-          "View File Extension",
-          "Rails"
+        const wsSettingsPath = path.join(
+          PROJECT_PATH,
+          ".vscode",
+          "settings.json"
         );
-        expect(setting).to.exist;
-        await setting.click();
-        await setting.setValue("html.haml");
-        await workbench.executeCommand("View: Close Editor");
+        const originalSettings = fs.readFileSync(wsSettingsPath, "utf8");
+        const settings = JSON.parse(originalSettings);
+        settings["rails.viewFileExtension"] = "html.haml";
+        fs.writeFileSync(wsSettingsPath, JSON.stringify(settings, null, 2));
 
-        await openFile("app/controllers/cats_controller.rb", 15);
-        await executeRawCommand("rails.createView");
-        const input = await InputBox.create();
-        expect(await input.getText()).to.equal("new.html.haml");
-        await input.confirm();
+        try {
+          await openFile("app/controllers/cats_controller.rb", 15);
+          // give VS Code time to pick up the changed workspace setting
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await executeRawCommand("rails.createView");
+          const input = await InputBox.create();
+          expect(await input.getText()).to.equal("new.html.haml");
+          await input.confirm();
 
-        await expectProjectFile("app/views/cats/new.html.haml");
+          await expectProjectFile("app/views/cats/new.html.haml");
+        } finally {
+          fs.writeFileSync(wsSettingsPath, originalSettings);
+        }
       });
     });
 
