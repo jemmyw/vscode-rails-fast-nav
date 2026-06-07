@@ -1,19 +1,16 @@
 import { SwitchFile } from '../types';
 import { RailsFile } from '../rails-file';
-import { RailsWorkspace, relativeToAppDir } from '../rails-workspace';
-import { appendWithoutExt } from '../path-utils';
-import * as path from 'path';
+import { RailsWorkspace, getTestPath } from '../rails-workspace';
 
 export function testMaker(
   railsFile: RailsFile,
   workspace: RailsWorkspace
 ): SwitchFile[] {
-  return [{
-    filename: path.join(
-      workspace.testPath,
-      appendWithoutExt(relativeToAppDir(workspace, railsFile.filename), '_test')
-    ),
-    title: 'Test file',
-    type: 'test',
-  }];
+  return [
+    {
+      filename: getTestPath(railsFile, workspace),
+      title: 'Test file',
+      type: 'test',
+    },
+  ];
 }

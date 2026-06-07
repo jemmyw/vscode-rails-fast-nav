@@ -35,6 +35,14 @@
           "default": "app",
           "description": "Absolute or relative (to first workspace root) path to Rails app directory"
         },
+        "rails.appDirs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "When non-empty, glob patterns for additional Rails app directories (engines, Packwerk packs, etc.). When empty, rails.appDir is used as the only app root."
+        },
         "rails.viewFileExtension": {
           "type": "string",
           "default": "html.erb",
@@ -116,7 +124,8 @@
     "test-prepare": "npm run test-compile && npm run copyTestProject",
     "test": "rimraf out; npm run test-prepare && extest setup-and-run -e test-resources/ext -o out/test/settings.json out/test/extension.test.js",
     "test-quick": "npm run test-prepare && extest run-tests -e test-resources/ext -o out/test/settings.json out/test/extension.test.js",
-    "copyTestProject": "cp -r src/test/project/* out/test; cp src/test/settings.json out/test"
+    "test:unit": "npm run test-compile && mocha out/test/rails-app-expand.unit.test.js",
+    "copyTestProject": "mkdir -p out/test && cp -a src/test/project/. out/test/ && cp src/test/settings.json out/test/"
   },
   "devDependencies": {
     "@types/chai": "^4.2.16",

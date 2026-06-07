@@ -1,2 +1,3 @@
 {
+  "rails.appDirs": ["app", "packs/*/app", "engines/*/app"]
 }

@@ -30,3 +30,13 @@ Change the default view extension from `html.erb`:
 ```json
 "rails.viewFileExtension": "json.jbuilder"
 ```
+
+### Multiple app roots (Packwerk, Rails engines)
+
+For repositories with several `app` directories (Packwerk packs, Rails engines, or custom components), set `rails.appDirs` to glob patterns relative to the Rails root. When `rails.appDirs` is empty or omitted, only `rails.appDir` is used (default `app`).
+
+```json
+"rails.appDirs": ["app", "packs/*/app", "engines/*/app"]
+```
+
+Navigation picks the **longest matching** app root for the current file, so files under `packs/billing/app/...` resolve specs and views next to `packs/billing/spec/` when that folder exists.

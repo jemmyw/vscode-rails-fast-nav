@@ -1,6 +1,10 @@
 import { SwitchFile } from '../types';
 import { RailsFile } from '../rails-file';
-import { RailsWorkspace } from '../rails-workspace';
+import {
+  RailsWorkspace,
+  getEffectiveSpecRoot,
+  getEffectiveTestRoot,
+} from '../rails-workspace';
 import { pluralize } from 'inflected';
 import * as path from 'path';
 
@@ -9,10 +13,10 @@ export async function fixtureMaker(
   workspace: RailsWorkspace
 ): Promise<SwitchFile[]> {
   const hasSpecs = await workspace.hasSpecs();
-  const fixturesPath = path.join(
-    hasSpecs ? workspace.specPath : workspace.testPath,
-    'fixtures'
-  );
+  const baseRoot = hasSpecs
+    ? getEffectiveSpecRoot(railsFile, workspace)
+    : getEffectiveTestRoot(railsFile, workspace);
+  const fixturesPath = path.join(baseRoot, 'fixtures');
 
   return railsFile.possibleModelNames().map(modelName => {
     const basename =
