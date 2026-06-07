@@ -31,7 +31,7 @@ export const rules = [
   switchRule((f, w) => w.hasTests(), testMaker),
   switchRule((f, w) => f.isTest(), inverseTestMaker),
   switchRule(f => !f.isModel(), modelMaker),
-  switchRule(f => f.isController(), viewMaker),
+  switchRule(f => f.isController() || f.isMailer(), viewMaker),
   switchRule(f => f.isModel() || f.isView(), controllerMaker),
   switchRule(f => !f.isFixture(), fixtureMaker),
 ];

@@ -12,7 +12,7 @@ function isCurrentMethodView(methodName: string, filename: string): boolean {
 
 export function switchToView(): Promise<void> {
   return getRailsContext(async function(railsFile, workspace) {
-    if (!railsFile.isController()) {
+    if (!railsFile.isController() && !railsFile.isMailer()) {
       return;
     }
 

@@ -160,6 +160,9 @@ export class RailsFile {
   isController() {
     return this.isInAppDir('controllers');
   }
+  isMailer() {
+    return this.isInAppDir('mailers');
+  }
   isModel() {
     return this.isInAppDir('models');
   }

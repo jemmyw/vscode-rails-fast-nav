@@ -207,6 +207,35 @@ describe("Extension Tests", function () {
     });
   });
 
+  describe("from mailer file", () => {
+    it("switches to the current mailer action view", async () => {
+      await openFile("app/mailers/user_mailer.rb", 2);
+      await executeRawCommand("rails.switchToView");
+      await expectProjectFile("app/views/user_mailer/welcome.html.erb");
+    });
+
+    it("switches to a namespaced mailer action view", async () => {
+      await openFile("app/mailers/admin/report_mailer.rb", 3);
+      await executeRawCommand("rails.switchToView");
+      await expectProjectFile(
+        "app/views/admin/report_mailer/daily_summary.html.erb"
+      );
+    });
+
+    it("includes mailer views in fast navigation", async () => {
+      await openFile("app/mailers/user_mailer.rb", 2);
+      await executeRawCommand("rails.fastNavigation");
+      const input = await InputBox.create();
+      const picks = await input.getQuickPicks();
+      const strings = await Promise.all(picks.map((p) => p.getLabel()));
+
+      expect(strings).to.deep.equal([
+        "View welcome.html.erb",
+        "View password_reset.text.erb",
+      ]);
+    });
+  });
+
   describe("Packwerk-style package (rails.appDirs)", () => {
     it("switch to view from package controller", async () => {
       await openFile(
