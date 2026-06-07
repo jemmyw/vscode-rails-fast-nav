@@ -94,6 +94,8 @@ describe("Extension Tests", function () {
       const pick = await input.findQuickPick(command);
       expect(pick, "to be present");
     }
+
+    await input.cancel();
   }).timeout(60000);
 
   describe("from controller file", () => {
@@ -121,6 +123,8 @@ describe("Extension Tests", function () {
         "View hello",
         "Partial _cat.html.erb",
       ]);
+
+      await input.cancel();
     });
 
     it("switch to view", async () => {
@@ -229,6 +233,8 @@ describe("Extension Tests", function () {
         "View welcome.html.erb",
         "View password_reset.text.erb",
       ]);
+
+      await input.cancel();
     });
   });
 
