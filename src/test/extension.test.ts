@@ -5,6 +5,7 @@ import {
   ActivityBar,
   InputBox,
   TextEditor,
+  VSBrowser,
   Workbench,
 } from "vscode-extension-tester";
 
@@ -28,10 +29,7 @@ describe("Extension Tests", function () {
   let workbench: Workbench;
 
   async function openFile(filename: string, line?: number) {
-    await executeCommand("Extest: Open File");
-    const input = await InputBox.create();
-    await input.setText(path.join(PROJECT_PATH, filename));
-    await input.confirm();
+    await VSBrowser.instance.openResources(path.join(PROJECT_PATH, filename));
 
     const editor = new TextEditor();
     await editor.wait(1000);
@@ -62,10 +60,8 @@ describe("Extension Tests", function () {
 
   before(async () => {
     workbench = new Workbench();
-    await executeCommand("Extest: Open Folder");
-    const input = await InputBox.create();
-    await input.setText(PROJECT_PATH + "/");
-    await input.confirm();
+    await VSBrowser.instance.openResources(PROJECT_PATH);
+    await VSBrowser.instance.waitForWorkbench();
 
     // to open a specific view and look it up
     const control = await new ActivityBar().getViewControl("Explorer");
