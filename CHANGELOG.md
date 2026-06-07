@@ -1,3 +1,7 @@
+## Unreleased
+
+- Switch to view now works from mailers, opening the matching `app/views/<mailer>/<action>` template (#32)
+
 ## 1.3.7
 
 - Add `rails.appDirs` support for multiple Rails app roots, including Packwerk packs, Rails engines, and custom app directories

@@ -346,13 +346,15 @@ export function getSpecPath(
 }
 
 /**
- * Get the view path of a controller
+ * Get the view path of a controller or mailer
  */
 export function getViewPath(workspace: RailsWorkspace, railsFile: RailsFile) {
-  const justName = railsFile.basename
-    .split('_')
-    .slice(0, -1)
-    .join('_');
+  const justName = railsFile.isMailer()
+    ? railsFile.withoutExt
+    : railsFile.basename
+        .split('_')
+        .slice(0, -1)
+        .join('_');
   const appRoot = railsFile.containingAppPath || workspace.appPath;
   const viewsPath = path.join(appRoot, 'views');
   return path.join(
