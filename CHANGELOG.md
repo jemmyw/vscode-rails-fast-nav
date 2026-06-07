@@ -1,3 +1,9 @@
+## 1.3.7
+
+- Add `rails.appDirs` support for multiple Rails app roots, including Packwerk packs, Rails engines, and custom app directories
+- Keep navigation within the nearest configured app root so switching between controllers, models, views, specs, tests, and fixtures works correctly in nested apps
+- Update webpack build toolchain for modern Node.js support
+
 ## 1.3.6
 
 - Updated README
