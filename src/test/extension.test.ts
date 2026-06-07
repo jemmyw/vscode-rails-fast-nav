@@ -88,8 +88,10 @@ describe("Extension Tests", function () {
       "Rails: Switch to Test",
       "Rails: Switch to Spec",
       "Rails: Switch to Fixture",
+      "Rails: Switch to Factory",
       "Rails: Create View",
       "Rails: Create Spec",
+      "Rails: Create Factory",
     ]) {
       const pick = await input.findQuickPick(command);
       expect(pick, "to be present");
@@ -210,6 +212,24 @@ describe("Extension Tests", function () {
       await openFile("app/models/cat.rb");
       await executeRawCommand("rails.switchToSpec");
       await expectProjectFile("spec/models/cat_spec.rb");
+    });
+
+    it("switch to factory", async () => {
+      await openFile("app/models/cat.rb");
+      await executeRawCommand("rails.switchToFactory");
+      await expectProjectFile("spec/factories/cats.rb");
+    });
+
+    it("switch to module factory", async () => {
+      await openFile("app/models/big/lion.rb");
+      await executeRawCommand("rails.switchToFactory");
+      await expectProjectFile("spec/factories/big/lions.rb");
+    });
+
+    it("create factory", async () => {
+      await openFile("app/models/dog.rb");
+      await executeRawCommand("rails.createFactory");
+      await expectProjectFile("spec/factories/dogs.rb");
     });
   });
 

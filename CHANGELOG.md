@@ -1,3 +1,7 @@
+## 1.5.0
+
+- Add "Switch to Factory" and "Create Factory" commands for FactoryBot factories. Switch to factory navigates to the model's factory (`spec/factories/cats.rb`, namespaced models under a subdirectory like `spec/factories/big/lions.rb`) and offers to create it when missing (#36)
+
 ## 1.4.0
 
 - Switch to view now works from mailers, opening the matching `app/views/<mailer>/<action>` template (#32)

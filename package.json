@@ -80,6 +80,14 @@
         "title": "Rails: Switch to Fixture"
       },
       {
+        "command": "rails.switchToFactory",
+        "title": "Rails: Switch to Factory"
+      },
+      {
+        "command": "rails.createFactory",
+        "title": "Rails: Create Factory"
+      },
+      {
         "command": "rails.createView",
         "title": "Rails: Create View"
       },
