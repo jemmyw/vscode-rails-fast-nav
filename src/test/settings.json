@@ -5,5 +5,7 @@
   "workbench.tips.enabled": false,
   "security.workspace.trust.enabled": false,
   "update.showReleaseNotes": false,
-  "telemetry.telemetryLevel": "off"
+  "telemetry.telemetryLevel": "off",
+  "chat.disableAIFeatures": true,
+  "chat.commandCenter.enabled": false
 }
