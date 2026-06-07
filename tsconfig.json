@@ -6,7 +6,8 @@
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": "src",
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", ".vscode-test", "dist", "test-resources"]
 }
