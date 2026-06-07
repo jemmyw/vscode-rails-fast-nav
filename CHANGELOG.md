@@ -1,4 +1,4 @@
-## Unreleased
+## 1.4.0
 
 - Switch to view now works from mailers, opening the matching `app/views/<mailer>/<action>` template (#32)
 
