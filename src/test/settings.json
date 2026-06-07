@@ -1,4 +1,11 @@
 {
   "files.simpleDialog.enable": true,
-  "window.dialogStyle": "custom"
+  "window.dialogStyle": "custom",
+  "workbench.startupEditor": "none",
+  "workbench.tips.enabled": false,
+  "security.workspace.trust.enabled": false,
+  "update.showReleaseNotes": false,
+  "telemetry.telemetryLevel": "off",
+  "chat.disableAIFeatures": true,
+  "chat.commandCenter.enabled": false
 }

@@ -5,6 +5,7 @@ import {
   ActivityBar,
   InputBox,
   TextEditor,
+  VSBrowser,
   Workbench,
 } from "vscode-extension-tester";
 
@@ -28,10 +29,7 @@ describe("Extension Tests", function () {
   let workbench: Workbench;
 
   async function openFile(filename: string, line?: number) {
-    await executeCommand("Extest: Open File");
-    const input = await InputBox.create();
-    await input.setText(path.join(PROJECT_PATH, filename));
-    await input.confirm();
+    await VSBrowser.instance.openResources(path.join(PROJECT_PATH, filename));
 
     const editor = new TextEditor();
     await editor.wait(1000);
@@ -62,10 +60,8 @@ describe("Extension Tests", function () {
 
   before(async () => {
     workbench = new Workbench();
-    await executeCommand("Extest: Open Folder");
-    const input = await InputBox.create();
-    await input.setText(PROJECT_PATH + "/");
-    await input.confirm();
+    await VSBrowser.instance.openResources(PROJECT_PATH);
+    await VSBrowser.instance.waitForWorkbench();
 
     // to open a specific view and look it up
     const control = await new ActivityBar().getViewControl("Explorer");
@@ -98,6 +94,8 @@ describe("Extension Tests", function () {
       const pick = await input.findQuickPick(command);
       expect(pick, "to be present");
     }
+
+    await input.cancel();
   }).timeout(60000);
 
   describe("from controller file", () => {
@@ -125,6 +123,8 @@ describe("Extension Tests", function () {
         "View hello",
         "Partial _cat.html.erb",
       ]);
+
+      await input.cancel();
     });
 
     it("switch to view", async () => {
@@ -152,23 +152,29 @@ describe("Extension Tests", function () {
       });
 
       it("with custom extension", async () => {
-        const settings = await workbench.openSettings();
-        const setting = await settings.findSetting(
-          "View File Extension",
-          "Rails"
+        const wsSettingsPath = path.join(
+          PROJECT_PATH,
+          ".vscode",
+          "settings.json"
         );
-        expect(setting).to.exist;
-        await setting.click();
-        await setting.setValue("html.haml");
-        await workbench.executeCommand("View: Close Editor");
+        const originalSettings = fs.readFileSync(wsSettingsPath, "utf8");
+        const settings = JSON.parse(originalSettings);
+        settings["rails.viewFileExtension"] = "html.haml";
+        fs.writeFileSync(wsSettingsPath, JSON.stringify(settings, null, 2));
 
-        await openFile("app/controllers/cats_controller.rb", 15);
-        await executeRawCommand("rails.createView");
-        const input = await InputBox.create();
-        expect(await input.getText()).to.equal("new.html.haml");
-        await input.confirm();
+        try {
+          await openFile("app/controllers/cats_controller.rb", 15);
+          // give VS Code time to pick up the changed workspace setting
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await executeRawCommand("rails.createView");
+          const input = await InputBox.create();
+          expect(await input.getText()).to.equal("new.html.haml");
+          await input.confirm();
 
-        await expectProjectFile("app/views/cats/new.html.haml");
+          await expectProjectFile("app/views/cats/new.html.haml");
+        } finally {
+          fs.writeFileSync(wsSettingsPath, originalSettings);
+        }
       });
     });
 
@@ -233,6 +239,8 @@ describe("Extension Tests", function () {
         "View welcome.html.erb",
         "View password_reset.text.erb",
       ]);
+
+      await input.cancel();
     });
   });
 
